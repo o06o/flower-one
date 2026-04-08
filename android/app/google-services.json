@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "391071227179",
+    "project_id": "flowerone",
+    "storage_bucket": "flowerone.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:391071227179:android:9d83284bb87b63323b396e",
+        "android_client_info": {
+          "package_name": "com.o06.flowerone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1G_6SvjMsy9rd4flYUDUYBtjcI3QmE0Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
