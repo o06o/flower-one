@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/designsystem/theme/app_theme.dart';
 import 'core/resource/gen/colors.gen.dart';
@@ -33,6 +34,13 @@ bool _shouldIgnoreError(Object error) {
   // if (error is DdukException) return true;
   return false;
 }
+
+const String _supabaseUrlFromEnv = String.fromEnvironment('SUPABASE_URL');
+const String _supabaseAnonKeyFromEnv = String.fromEnvironment('SUPABASE_ANON_KEY');
+
+const String _defaultSupabaseUrl = 'https://guhizwvdrmfdhcdagcuo.supabase.co';
+const String _defaultSupabaseAnonKey =
+    'sb_publishable_6FZQ0KfiBslPuBh1fUbFEw_Uc-z99Pz';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -86,6 +94,18 @@ Future<void> initializePackages() async {
     // 필요하면 portraitDown도 추가
     // DeviceOrientation.portraitDown,
   ]);
+
+  final supabaseUrl = _supabaseUrlFromEnv.isNotEmpty
+      ? _supabaseUrlFromEnv
+      : _defaultSupabaseUrl;
+  final supabaseAnonKey = _supabaseAnonKeyFromEnv.isNotEmpty
+      ? _supabaseAnonKeyFromEnv
+      : _defaultSupabaseAnonKey;
+
+  await Supabase.initialize(
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
+  );
 
   // final firebaseOptions = switch (appFlavor) {
   //   'prod' => prod.DefaultFirebaseOptions.currentPlatform,
