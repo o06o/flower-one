@@ -1,0 +1,37 @@
+<resources>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+
+    <!--   region color palette -->
+    <color name="primary">#FFE5989B</color>
+    <color name="secondary">#FF9BB291</color>
+    <color name="tertiary">#FFD4A373</color>
+    <color name="neutral">#FFFBF9F4</color>
+
+    <color name="grayscale_black">#FF111111</color>
+    <color name="grayscale_gray_900">#FF262427</color>
+    <color name="grayscale_gray_600">#FF353535</color>
+    <color name="grayscale_gray_500">#FF444444</color>
+    <color name="grayscale_gray_400">#FF999999</color>
+    <color name="grayscale_gray_300">#FFCCCCCC</color>
+    <color name="grayscale_gray_200">#FFDDDDDD</color>
+    <color name="grayscale_gray_100">#FFEEEEEE</color>
+    <color name="grayscale_white">#FFEBE9E3</color>
+
+    <color name="background_dim">#99000000</color>
+
+    <color name="line_box">#FFCCCCCC</color>
+    <color name="line_popup">#FFEEEEEE</color>
+
+    <color name="background_light_gray">#FFFAFAFA</color>
+    <color name="background_light_blue">#FFE5F7FF</color>
+
+    <color name="red">#FFE15833</color>
+
+    <!--   endregion color palette -->
+
+    <!--   region dark theme color palette -->
+
+    <!--   endregion dark theme color palette -->
+
+</resources>

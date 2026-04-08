@@ -3,11 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'config/app_config.dart';
+import 'core/designsystem/theme/app_theme.dart';
+import 'core/resource/gen/colors.gen.dart';
 import 'core/router/app_router.dart';
 
 Future<void> main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   await initializePackages();
 
   runApp(const MainApp());
@@ -60,20 +61,24 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
           final brightness = MediaQuery.of(context).platformBrightness;
           final isDarkMode = brightness == Brightness.dark;
 
-          return MaterialApp.router(
-            builder: FToastBuilder(),
-            routerConfig: router,
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-                useMaterial3: true
-            ).copyWith(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              hoverColor: Colors.transparent,
-              // textSelectionTheme: TextSelectionThemeData(
-              //   cursorColor: ColorName.primaryLightGreen,
-              //   selectionHandleColor: ColorName.primaryLightGreen,
-              // ),
+          return FlowerTheme(
+            themeData: isDarkMode
+                ? FlowerThemeData.dark() : FlowerThemeData.light(),
+            child: MaterialApp.router(
+              builder: FToastBuilder(),
+              routerConfig: router,
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                  useMaterial3: true
+              ).copyWith(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                textSelectionTheme: TextSelectionThemeData(
+                  cursorColor: ColorName.primary,
+                  selectionHandleColor: ColorName.primary,
+                ),
+              ),
             ),
           );
         },
