@@ -1,29 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/router/pages.dart';
+import '../../../../core/designsystem/dialog/progress_dialog.dart';
+import '../viewmodels/splash_viewmodel.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
+  ConsumerState<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> {
+class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   void initState() {
     super.initState();
-    Future<void>.delayed(const Duration(seconds: 1), () {
-      if (!mounted) return;
-      context.go(PAGES.signIn.screenPath);
-    });
+    Future<void>.microtask(
+      () => ref.read(splashViewModelProvider.notifier).resolveInitialRoute(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Center(child: Text("splash")),
-    );
+    ref.listen<SplashState>(splashViewModelProvider, (previous, next) {
+      final nextPath = next.nextPath;
+      if (nextPath == null) return;
+      if (previous?.nextPath == nextPath) return;
+      if (!mounted) return;
+
+      context.go(nextPath);
+    });
+
+    return const Material(child: Center(child: LottieProgressWidget()));
   }
 }

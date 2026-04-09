@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/designsystem/dialog/progress_dialog.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -28,8 +30,6 @@ class _HomePageState extends State<HomePage> {
 
     final tags = rows
         .map<String?>((row) {
-          if (row is! Map<String, dynamic>) return null;
-
           final value = row['name'];
           return value is String ? value : value?.toString();
         })
@@ -53,7 +53,7 @@ class _HomePageState extends State<HomePage> {
       future: _tagsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: LottieProgressWidget());
         }
 
         if (snapshot.hasError) {
@@ -69,10 +69,7 @@ class _HomePageState extends State<HomePage> {
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: _refresh,
-                  child: const Text('다시 시도'),
-                ),
+                FilledButton(onPressed: _refresh, child: const Text('다시 시도')),
               ],
             ),
           );
