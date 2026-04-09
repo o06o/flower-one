@@ -1,4 +1,5 @@
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/foundation.dart';
 
 class GoogleSignInResult {
   final String idToken;
@@ -13,37 +14,82 @@ class GoogleSignInResult {
 }
 
 class GoogleSignClient {
-  final GoogleSignIn _googleSignIn;
-
-  GoogleSignClient({
-    required String clientId,
-    required String serverClientId,
-    List<String>? scopes,
-  }) : _googleSignIn = GoogleSignIn(
-    clientId: clientId,
-    serverClientId: serverClientId,
-    scopes: scopes ?? ['email'],
+  static const String _iosClientIdFromEnv = String.fromEnvironment(
+    'GOOGLE_IOS_CLIENT_ID',
   );
+  static const String _androidClientIdFromEnv = String.fromEnvironment(
+    'GOOGLE_ANDROID_CLIENT_ID',
+  );
+  static const String _serverClientIdFromEnv = String.fromEnvironment(
+    'GOOGLE_SERVER_CLIENT_ID',
+  );
+  static const List<String> _defaultScopes = <String>[
+    'email',
+    'https://www.googleapis.com/auth/contacts.readonly',
+  ];
+
+  final GoogleSignIn _googleSignIn;
+  static Future<void>? _initializeFuture;
+
+  GoogleSignClient._() : _googleSignIn = GoogleSignIn.instance;
+
+  factory GoogleSignClient() {
+    return GoogleSignClient._();
+  }
+
+  String? get _clientId {
+    if (kIsWeb) return null;
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+        return _iosClientIdFromEnv.isEmpty ? null : _iosClientIdFromEnv;
+      case TargetPlatform.android:
+        return _androidClientIdFromEnv.isEmpty ? null : _androidClientIdFromEnv;
+      default:
+        return null;
+    }
+  }
+
+  String? get _serverClientId =>
+      _serverClientIdFromEnv.isEmpty ? null : _serverClientIdFromEnv;
+
+  Future<void> _ensureInitialized() {
+    _initializeFuture ??= _googleSignIn.initialize(
+      clientId: _clientId,
+      serverClientId: _serverClientId,
+    );
+    return _initializeFuture!;
+  }
 
   Future<GoogleSignInResult?> signIn() async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      await _ensureInitialized();
+      if (!_googleSignIn.supportsAuthenticate()) return null;
 
-      if (googleUser != null) {
-        final auth = await googleUser.authentication;
-        final idToken = auth.idToken;
-        final accessToken = auth.accessToken;
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate(
+        scopeHint: _defaultScopes,
+      );
 
-        if (idToken == null || idToken.isEmpty) return null;
-        if (accessToken == null || accessToken.isEmpty) return null;
+      final idToken = googleUser.authentication.idToken;
+      if (idToken == null || idToken.isEmpty) return null;
 
-        return GoogleSignInResult(
-          idToken: idToken,
-          accessToken: accessToken,
-          serverAuthCode: googleUser.serverAuthCode,
-        );
-      }
-      return null; // 사용자가 로그인을 취소한 경우
+      final authorizationClient = googleUser.authorizationClient;
+      final GoogleSignInClientAuthorization authorization =
+          await authorizationClient.authorizationForScopes(_defaultScopes) ??
+          await authorizationClient.authorizeScopes(_defaultScopes);
+      if (authorization.accessToken.isEmpty) return null;
+
+      final GoogleSignInServerAuthorization? serverAuthorization =
+          await authorizationClient.authorizeServer(_defaultScopes);
+
+      return GoogleSignInResult(
+        idToken: idToken,
+        accessToken: authorization.accessToken,
+        serverAuthCode: serverAuthorization?.serverAuthCode,
+      );
+    } on GoogleSignInException catch (error) {
+      if (error.code == GoogleSignInExceptionCode.canceled) return null;
+      return null;
     } catch (error) {
       return null; // 에러 처리
     }
@@ -51,6 +97,7 @@ class GoogleSignClient {
 
   Future<void> signOut() async {
     try {
+      await _ensureInitialized();
       await _googleSignIn.signOut();
     } catch (error) {
       // ignore sign-out failures

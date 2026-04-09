@@ -14,7 +14,6 @@ import 'core/designsystem/theme/app_theme.dart';
 import 'core/resource/gen/colors.gen.dart';
 import 'core/router/app_router.dart';
 import 'core/storage/pref/pref_storage.dart';
-import 'core/storage/secure/secure.dart';
 
 bool _shouldIgnoreFlutterError(FlutterErrorDetails details) {
   final text = details.exceptionAsString();
@@ -23,7 +22,9 @@ bool _shouldIgnoreFlutterError(FlutterErrorDetails details) {
   if (text.contains('A RenderFlex overflowed by')) return true;
   if (text.contains('RenderBox was not laid out')) return true;
   if (text.contains('BoxConstraints forces an infinite')) return true;
-  if (text.contains('Viewport') && text.contains('was given unbounded')) return true;
+  if (text.contains('Viewport') && text.contains('was given unbounded')) {
+    return true;
+  }
 
   // 필요하면 계속 추가
   return false;
@@ -36,11 +37,9 @@ bool _shouldIgnoreError(Object error) {
 }
 
 const String _supabaseUrlFromEnv = String.fromEnvironment('SUPABASE_URL');
-const String _supabaseAnonKeyFromEnv = String.fromEnvironment('SUPABASE_ANON_KEY');
-
-const String _defaultSupabaseUrl = 'https://guhizwvdrmfdhcdagcuo.supabase.co';
-const String _defaultSupabaseAnonKey =
-    'sb_publishable_6FZQ0KfiBslPuBh1fUbFEw_Uc-z99Pz';
+const String _supabaseAnonKeyFromEnv = String.fromEnvironment(
+  'SUPABASE_ANON_KEY',
+);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,25 +66,29 @@ Future<void> main() async {
 
   final container = ProviderContainer(
     overrides: [
-      preferenceStorageProvider.overrideWithValue(PreferenceStorage(preferences)),
+      preferenceStorageProvider.overrideWithValue(
+        PreferenceStorage(preferences),
+      ),
     ],
   );
 
-  final secureStorage = container.read(secureStorageDataSourceProvider);
-
-  runZonedGuarded<Future<void>>(() async {
-    initializeDateFormatting().then((_) => runApp(
-      UncontrolledProviderScope(
-        container: container,
-        child: const MainApp(),
-      ),
-    ));
-
-  }, (error, stack) {
-    if (kReleaseMode && !_shouldIgnoreError(error)) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    }
-  });
+  runZonedGuarded<Future<void>>(
+    () async {
+      initializeDateFormatting().then(
+        (_) => runApp(
+          UncontrolledProviderScope(
+            container: container,
+            child: const MainApp(),
+          ),
+        ),
+      );
+    },
+    (error, stack) {
+      if (kReleaseMode && !_shouldIgnoreError(error)) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      }
+    },
+  );
 }
 
 Future<void> initializePackages() async {
@@ -95,17 +98,16 @@ Future<void> initializePackages() async {
     // DeviceOrientation.portraitDown,
   ]);
 
-  final supabaseUrl = _supabaseUrlFromEnv.isNotEmpty
-      ? _supabaseUrlFromEnv
-      : _defaultSupabaseUrl;
-  final supabaseAnonKey = _supabaseAnonKeyFromEnv.isNotEmpty
-      ? _supabaseAnonKeyFromEnv
-      : _defaultSupabaseAnonKey;
-
-  await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
+  final supabaseUrl = _requireEnv(
+    name: 'SUPABASE_URL',
+    value: _supabaseUrlFromEnv,
   );
+  final supabaseAnonKey = _requireEnv(
+    name: 'SUPABASE_ANON_KEY',
+    value: _supabaseAnonKeyFromEnv,
+  );
+
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
 
   // final firebaseOptions = switch (appFlavor) {
   //   'prod' => prod.DefaultFirebaseOptions.currentPlatform,
@@ -114,6 +116,14 @@ Future<void> initializePackages() async {
   // };
   //
   // await Firebase.initializeApp(options: firebaseOptions);
+}
+
+String _requireEnv({required String name, required String value}) {
+  if (value.isNotEmpty) return value;
+
+  throw StateError(
+    '$name is missing. Run with --dart-define or --dart-define-from-file.',
+  );
 }
 
 class MainApp extends StatefulWidget {
@@ -149,14 +159,13 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
 
           return FlowerTheme(
             themeData: isDarkMode
-                ? FlowerThemeData.dark() : FlowerThemeData.light(),
+                ? FlowerThemeData.dark()
+                : FlowerThemeData.light(),
             child: MaterialApp.router(
               builder: FToastBuilder(),
               routerConfig: router,
               debugShowCheckedModeBanner: false,
-              theme: ThemeData(
-                  useMaterial3: true
-              ).copyWith(
+              theme: ThemeData(useMaterial3: true).copyWith(
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 hoverColor: Colors.transparent,

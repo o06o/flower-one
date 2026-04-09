@@ -4,14 +4,17 @@ import 'package:flutter/material.dart';
 import '../google_client.dart';
 
 class GoogleSignInWidget extends StatelessWidget {
-  final GoogleSignClient googleSignClient;
-  final void Function(GoogleSignInResult?) onResult;
+  final Future<void> Function(
+    String idToken,
+    String accessToken,
+    String? serverAuthCode,
+  )
+  onSuccess;
+  final VoidCallback? onFailed;
 
-  const GoogleSignInWidget({
-    super.key,
-    required this.onResult,
-    required this.googleSignClient,
-  });
+  static final GoogleSignClient _googleSignClient = GoogleSignClient();
+
+  const GoogleSignInWidget({super.key, required this.onSuccess, this.onFailed});
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +29,17 @@ class GoogleSignInWidget extends StatelessWidget {
           elevation: 1, // 약간의 그림자 효과 추가
         ),
         onPressed: () async {
-          final signInResult = await googleSignClient.signIn();
-          onResult(signInResult);
+          final signInResult = await _googleSignClient.signIn();
+          if (signInResult == null) {
+            onFailed?.call();
+            return;
+          }
+
+          await onSuccess(
+            signInResult.idToken,
+            signInResult.accessToken,
+            signInResult.serverAuthCode,
+          );
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
