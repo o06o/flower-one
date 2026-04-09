@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/designsystem/dialog/progress_dialog.dart';
 import '../viewmodels/splash_viewmodel.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -30,8 +29,9 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       if (!mounted) return;
 
       context.go(nextPath);
+
     });
 
-    return const Material(child: Center(child: LottieProgressWidget()));
+    return Container();
   }
 }

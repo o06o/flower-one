@@ -26,6 +26,7 @@ dependencies:
   lottie: ^3.3.1
   shimmer: ^3.0.0
   flutter_svg: ^2.0.15
+  flutter_native_splash: 2.4.0
 
   # Flutter Gen
   flutter_gen_runner: ^5.10.0
@@ -127,3 +128,7 @@ flutter:
           weight: 600
         - asset: assets/fonts/pretendard/Pretendard-Bold.ttf
           weight: 700
+    - family: Hakgyoansim
+      fonts:
+        - asset: assets/fonts/hakgyoansim/Hakgyoansim-R.ttf
+          weight: 400

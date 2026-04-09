@@ -27,21 +27,27 @@ class $AssetsColorsGen {
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
+  /// File path: assets/icons/flowerone_logo.png
+  AssetGenImage get floweroneLogo => const AssetGenImage('assets/icons/flowerone_logo.png');
+
+  /// File path: assets/icons/flowerone_logo_filled.png
+  AssetGenImage get floweroneLogoFilled => const AssetGenImage('assets/icons/flowerone_logo_filled.png');
+
   /// File path: assets/icons/google_logo.svg
   SvgGenImage get googleLogo => const SvgGenImage('assets/icons/google_logo.svg');
 
   /// List of all assets
-  List<SvgGenImage> get values => [googleLogo];
+  List<dynamic> get values => [floweroneLogo, floweroneLogoFilled, googleLogo];
 }
 
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
-  /// File path: assets/images/Background.png
-  AssetGenImage get background => const AssetGenImage('assets/images/Background.png');
+  /// File path: assets/images/ic_intro_flower.png
+  AssetGenImage get icIntroFlower => const AssetGenImage('assets/images/ic_intro_flower.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [background];
+  List<AssetGenImage> get values => [icIntroFlower];
 }
 
 class $AssetsLottiesGen {

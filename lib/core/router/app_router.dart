@@ -51,6 +51,7 @@ final router = GoRouter(
       path: PAGES.intro.screenPath,
       pageBuilder: (context, state) => FadeTransitionPage(
         key: state.pageKey,
+        duration: const Duration(milliseconds: 700),
         child: const IntroPage(),
       ),
     ),
@@ -59,6 +60,7 @@ final router = GoRouter(
       path: PAGES.signIn.screenPath,
       pageBuilder: (context, state) => FadeTransitionPage(
         key: state.pageKey,
+        duration: const Duration(milliseconds: 700),
         child: const SignInPage(),
       ),
     ),

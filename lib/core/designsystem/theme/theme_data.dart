@@ -91,6 +91,14 @@ extension on FlowerTextTheme {
     letterSpacing: 0,
     color: textBlack,
   );
+
+  TextStyle hakgyoTextStyleForSize(double size) => TextStyle(
+    fontFamily: FontFamily.hakgyoansim,
+    fontSize: size,
+    height: 1,
+    letterSpacing: 0,
+    color: textBlack,
+  );
 }
 
 extension FlowerTextThemeDefaultExtension on FlowerTextTheme {
@@ -128,6 +136,9 @@ extension FlowerTextThemeDefaultExtension on FlowerTextTheme {
   TextStyle get default13SemiBold => defaultTextStyleForSize(13.0).toSemiBold();
 
   // w500
+
+
+
   TextStyle get default24Medium => defaultTextStyleForSize(24.0).toMedium();
 
   TextStyle get default20Medium => defaultTextStyleForSize(20.0).toMedium();
@@ -151,6 +162,9 @@ extension FlowerTextThemeDefaultExtension on FlowerTextTheme {
   TextStyle get default8Medium => defaultTextStyleForSize(8.0).toMedium();
 
   // w400
+  TextStyle get hakgyo18Medium => hakgyoTextStyleForSize(20.0).toRegular();
+
+
   TextStyle get default22Regular => defaultTextStyleForSize(22.0).toRegular();
 
   TextStyle get default20Regular => defaultTextStyleForSize(20.0).toRegular();
@@ -203,6 +217,8 @@ extension FlowerTextThemeAlias on FlowerTextTheme {
   TextStyle get headline2RegularBlack => default18Regular.copyWith(color: textBlack);
   TextStyle get headline2RegularWhite => default18Regular.copyWith(color: textWhite);
   TextStyle get headline2RegularMulti => headline2Regular.copyWith(height: 1.6);
+
+  TextStyle get headline2RegularHakgyoMulti => hakgyo18Medium.copyWith(height: 1.6);
 
   TextStyle get headline3Medium => default24Medium;
   TextStyle get headline3GrayBlack => default24Medium.copyWith(color: textBlack);

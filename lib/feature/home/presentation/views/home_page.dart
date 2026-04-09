@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:flowerone/core/designsystem/components/container/default_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/designsystem/dialog/progress_dialog.dart';
@@ -19,6 +23,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    Timer(const Duration(seconds: 1), () {
+      if (!mounted) return;
+      FlutterNativeSplash.remove();
+    });
     _tagsFuture = _fetchTags();
   }
 
@@ -80,14 +88,16 @@ class _HomePageState extends State<HomePage> {
           return const Center(child: Text('등록된 태그가 없어요.'));
         }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: List.generate(
-              tags.length,
-              (index) => Chip(label: Text(tags[index])),
+        return DefaultContainer(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: List.generate(
+                tags.length,
+                (index) => Chip(label: Text(tags[index])),
+              ),
             ),
           ),
         );

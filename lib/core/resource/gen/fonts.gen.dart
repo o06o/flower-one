@@ -11,6 +11,9 @@
 class FontFamily {
   FontFamily._();
 
+  /// Font family: Hakgyoansim
+  static const String hakgyoansim = 'Hakgyoansim';
+
   /// Font family: Pretendard
   static const String pretendard = 'Pretendard';
 }

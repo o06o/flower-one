@@ -4,7 +4,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/designsystem/components/coponents.dart';
+import '../../../../core/designsystem/theme/theme_data.dart';
+import '../../../../core/resource/gen/assets.gen.dart';
 import '../../../../core/router/pages.dart';
+import '../../../../core/utils/hero_tags.dart';
 import '../../../../libraries/google/widget/google_sign_in_widget.dart';
 
 class SignInPage extends StatefulWidget {
@@ -52,17 +56,36 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Center(
-            child: GoogleSignInWidget(
-              onSuccess: _signInToSupabase,
-              onFailed: () => _showFailToast('구글 로그인에 실패했어요.'),
+    return DefaultContainer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Hero(
+            tag: HeroTags.introToSignInLogo,
+            child: Image.asset(
+              Assets.icons.floweroneLogoFilled.keyName,
+              width: 146,
+              height: 146,
             ),
           ),
-        ),
+          Text(
+            "꽃 한 송이로\n말로 전하기 어려운 마음\n전해보세요",
+            style: context.textTheme.headline2RegularHakgyoMulti,
+            textAlign: TextAlign.center,
+          ),
+          SpacingVertical64(),
+          GoogleSignInWidget(
+            onSuccess: _signInToSupabase,
+            onFailed: () => _showFailToast('애플 로그인에 실패했어요.'),
+          ),
+          SpacingVertical16(),
+          GoogleSignInWidget(
+            onSuccess: _signInToSupabase,
+            onFailed: () => _showFailToast('구글 로그인에 실패했어요.'),
+          ),
+          SpacingVertical48(),
+        ],
       ),
     );
   }
