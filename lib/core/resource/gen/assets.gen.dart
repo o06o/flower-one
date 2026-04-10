@@ -27,6 +27,9 @@ class $AssetsColorsGen {
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
+  /// File path: assets/icons/Ic_garden_filled.svg
+  SvgGenImage get icGardenFilled => const SvgGenImage('assets/icons/Ic_garden_filled.svg');
+
   /// File path: assets/icons/flowerone_logo.png
   AssetGenImage get floweroneLogo => const AssetGenImage('assets/icons/flowerone_logo.png');
 
@@ -36,8 +39,33 @@ class $AssetsIconsGen {
   /// File path: assets/icons/google_logo.svg
   SvgGenImage get googleLogo => const SvgGenImage('assets/icons/google_logo.svg');
 
+  /// File path: assets/icons/ic_garden.svg
+  SvgGenImage get icGarden => const SvgGenImage('assets/icons/ic_garden.svg');
+
+  /// File path: assets/icons/ic_home.svg
+  SvgGenImage get icHome => const SvgGenImage('assets/icons/ic_home.svg');
+
+  /// File path: assets/icons/ic_home_filled.svg
+  SvgGenImage get icHomeFilled => const SvgGenImage('assets/icons/ic_home_filled.svg');
+
+  /// File path: assets/icons/ic_map.svg
+  SvgGenImage get icMap => const SvgGenImage('assets/icons/ic_map.svg');
+
+  /// File path: assets/icons/ic_map_filled.svg
+  SvgGenImage get icMapFilled => const SvgGenImage('assets/icons/ic_map_filled.svg');
+
   /// List of all assets
-  List<dynamic> get values => [floweroneLogo, floweroneLogoFilled, googleLogo];
+  List<dynamic> get values => [
+    icGardenFilled,
+    floweroneLogo,
+    floweroneLogoFilled,
+    googleLogo,
+    icGarden,
+    icHome,
+    icHomeFilled,
+    icMap,
+    icMapFilled,
+  ];
 }
 
 class $AssetsImagesGen {

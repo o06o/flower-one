@@ -309,6 +309,7 @@ class FlowerColorScheme extends ICoreColorScheme {
   Color get btn_2 => isDarkMode ? ColorName.grayscaleGray500 : ColorName.grayscaleGray100;
   Color get checkbox => isDarkMode ? ColorName.grayscaleGray500 : ColorName.grayscaleGray300;
   Color get secondary => ColorName.secondary;
+  Color get deepRed => ColorName.deepRed;
 
   // 레거시 호환용 (기존 코드와의 호환성)
   Color get white => isDarkMode ? ColorName.black : ColorName.white;
@@ -319,6 +320,7 @@ class FlowerColorScheme extends ICoreColorScheme {
   Color get read => ColorName.red;
   // 브랜드 색상 (다크모드에서도 유지)
   Color get primary => ColorName.primary;
+  Color get neutral => isDarkMode ? ColorName.neutralDark : ColorName.neutral;
 
   Color get grayscaleWhite => ColorName.grayscaleWhite;
 

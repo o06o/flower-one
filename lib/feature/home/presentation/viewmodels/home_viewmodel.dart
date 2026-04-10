@@ -60,7 +60,7 @@ final homeViewModelProvider =
 class HomeViewModel extends StateNotifier<HomeState> {
   static const String _tagTable = 'tags';
   static const String _orderColumn = 'id';
-  static const String _functionName = 'recommend-flower-letter';
+  static const String _functionName = 'recommend-flower';
 
   final SupabaseClient _client;
 

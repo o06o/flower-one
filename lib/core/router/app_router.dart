@@ -70,14 +70,10 @@ final router = GoRouter(
         return ScaffoldWithNestedNavigation(
             navigationShell: child,
             currentIndex: switch (state.uri.path) {
-              var p when p.startsWith("/history") => 2,
-              var p when p.startsWith("/my") => 3,
-              "/settings" => 3,
-              "/announcement" => 3,
-              "/faq" => 3,
-              "/inquiry" => 3,
-              "/withdrawal" => 3,
-              _ => 0,
+              "/map" => 0,
+              "/home" => 1,
+              "/garden" => 2,
+              _ => 1,
             }
         );
       },

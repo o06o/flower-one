@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/designsystem/components/coponents.dart';
+import '../../../../core/designsystem/theme/theme_data.dart';
+import '../../../../core/resource/gen/assets.gen.dart';
+import '../../../../core/router/pages.dart';
 
 class ScaffoldWithNestedNavigation extends ConsumerStatefulWidget {
   final Widget navigationShell;
@@ -17,110 +23,64 @@ class _ScaffoldWithNestedNavigationState
     extends ConsumerState<ScaffoldWithNestedNavigation> {
   @override
   Widget build(BuildContext context) {
-    // final selectedItemColor = context.colorScheme.selectedBottomItemColor;
-    // final unSelectedItemColor = context.colorScheme.black;
-    // final selectedItemColorFilter =
-    //     ColorFilter.mode(selectedItemColor, BlendMode.srcIn);
-    // final unSelectedItemColorFilter =
-    //     ColorFilter.mode(unSelectedItemColor, BlendMode.srcIn);
+    final selectedItemColor = context.colorScheme.deepRed;
 
     return Scaffold(
-      // backgroundColor: context.colorScheme.surface,
+      backgroundColor: context.colorScheme.neutral,
       body: widget.navigationShell,
-      // bottomNavigationBar: BottomNavigationBar(
-      //   type: BottomNavigationBarType.fixed,
-      //   currentIndex: widget.currentIndex,
-      //   backgroundColor: context.colorScheme.grayscaleWhite,
-      //   selectedItemColor: selectedItemColor,
-      //   unselectedItemColor: context.colorScheme.black,
-      //   unselectedLabelStyle: context.textTheme.tabBar
-      //       .copyWith(color: context.colorScheme.black),
-      //   selectedLabelStyle: context.textTheme.tabBar,
-      //   items: [
-      //     BottomNavigationBarItem(
-      //       label: "홈",
-      //       icon: BottomNavIcon(
-      //         child: Assets.icons.iconUnselectedHome.svg(
-      //           colorFilter: unSelectedItemColorFilter,
-      //         ),
-      //       ),
-      //       activeIcon: BottomNavIcon(
-      //         child: Assets.icons.iconSelectedHome.svg(
-      //           colorFilter: selectedItemColorFilter,
-      //         ),
-      //       ),
-      //     ),
-      //     BottomNavigationBarItem(
-      //       label: "추가",
-      //       icon: BottomNavIcon(
-      //         child: Assets.icons.iconCircleAdd.svg(
-      //           colorFilter: unSelectedItemColorFilter,
-      //         ),
-      //       ),
-      //       activeIcon: BottomNavIcon(
-      //         child: Assets.icons.iconCircleAdd.svg(
-      //           colorFilter: selectedItemColorFilter,
-      //         ),
-      //       ),
-      //     ),
-      //     BottomNavigationBarItem(
-      //       label: "히스토리",
-      //       icon: BottomNavIcon(
-      //         child: Assets.icons.iconUnselectedHistory.svg(
-      //           colorFilter: unSelectedItemColorFilter,
-      //         ),
-      //       ),
-      //       activeIcon: BottomNavIcon(
-      //         child: Assets.icons.iconSelectedHistory.svg(
-      //           colorFilter: selectedItemColorFilter,
-      //         ),
-      //       ),
-      //     ),
-      //     BottomNavigationBarItem(
-      //       label: "MY",
-      //       icon: BottomNavIcon(
-      //         child: Assets.icons.iconUnselectedMy.svg(
-      //           colorFilter: unSelectedItemColorFilter,
-      //         ),
-      //       ),
-      //       activeIcon: BottomNavIcon(
-      //         child: Assets.icons.iconSelectedMy.svg(
-      //           colorFilter: selectedItemColorFilter,
-      //         ),
-      //       ),
-      //     ),
-      //   ],
-      //   onTap: (index) {
-      //     final hasGroup = ref.read(hasGroupProvider);
-      //
-      //     switch (index) {
-      //       case 0:
-      //         context.go(PAGES.home.screenPath);
-      //         break;
-      //       case 1:
-      //         if (hasGroup == true) {
-      //           context.pushNamed(PAGES.add.screenName);
-      //         } else {
-      //           CustomDialog.showAlert(
-      //               context: context,
-      //               body: "아직 가입된 그룹이 없어요.\n그룹 생성 또는 참여해서\n이용해 주세요.");
-      //         }
-      //         return;
-      //       case 2:
-      //         if (hasGroup == true) {
-      //           context.go(PAGES.history.screenPath);
-      //         } else {
-      //           CustomDialog.showAlert(
-      //               context: context,
-      //               body: "아직 가입된 그룹이 없어요.\n그룹 생성 또는 참여해서\n이용해 주세요.");
-      //         }
-      //         break;
-      //       case 3:
-      //         context.go(PAGES.my.screenPath);
-      //         break;
-      //     }
-      //   },
-      // ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.shifting,
+        currentIndex: widget.currentIndex,
+        selectedItemColor: selectedItemColor,
+        selectedLabelStyle: context.textTheme.tabBar,
+        items: [
+          BottomNavigationBarItem(
+            label: "지도",
+            icon: BottomNavIcon(
+              child: Assets.icons.icMap.svg(),
+            ),
+            activeIcon: BottomNavIcon(
+              child: Assets.icons.icMapFilled.svg(),
+            ),
+            backgroundColor: context.colorScheme.white,
+          ),
+          BottomNavigationBarItem(
+            label: "홈",
+            icon: BottomNavIcon(
+              child: Assets.icons.icHome.svg(
+              ),
+            ),
+            activeIcon: BottomNavIcon(
+              child: Assets.icons.icHomeFilled.svg(),
+            ),
+            backgroundColor: context.colorScheme.white,
+          ),
+          BottomNavigationBarItem(
+            label: "정원",
+            icon: BottomNavIcon(
+              child: Assets.icons.icGarden.svg(
+              ),
+            ),
+            activeIcon: BottomNavIcon(
+              child: Assets.icons.icGardenFilled.svg(),
+            ),
+            backgroundColor: context.colorScheme.white,
+          ),
+        ],
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              context.go(PAGES.map.screenPath);
+              break;
+            case 1:
+              context.pushNamed(PAGES.home.screenName);
+              return;
+            case 2:
+                context.go(PAGES.garden.screenPath);
+              break;
+          }
+        },
+      ),
     );
   }
 }

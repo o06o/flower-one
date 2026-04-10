@@ -26,6 +26,9 @@ class ColorName {
   /// Color: #FF000000
   static const Color black = Color(0xFF000000);
 
+  /// Color: #FF8B4C50
+  static const Color deepRed = Color(0xFF8B4C50);
+
   /// Color: #FF111111
   static const Color grayscaleBlack = Color(0xFF111111);
 
@@ -61,6 +64,9 @@ class ColorName {
 
   /// Color: #FFFBF9F4
   static const Color neutral = Color(0xFFFBF9F4);
+
+  /// Color: #FF1A1816
+  static const Color neutralDark = Color(0xFF1A1816);
 
   /// Color: #FFE5989B
   static const Color primary = Color(0xFFE5989B);
