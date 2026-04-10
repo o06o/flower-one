@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,6 +41,9 @@ bool _shouldIgnoreError(Object error) {
 const String _supabaseUrlFromEnv = String.fromEnvironment('SUPABASE_URL');
 const String _supabaseAnonKeyFromEnv = String.fromEnvironment(
   'SUPABASE_ANON_KEY',
+);
+const String _naverMapClientIdFromEnv = String.fromEnvironment(
+  'NAVER_MAP_CLIENT_ID',
 );
 
 Future<void> main() async {
@@ -111,6 +115,22 @@ Future<void> initializePackages() async {
   );
 
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+
+  if (_naverMapClientIdFromEnv.isNotEmpty) {
+    await FlutterNaverMap().init(
+      clientId: _naverMapClientIdFromEnv,
+      onAuthFailed: (ex) {
+        if (kDebugMode) {
+          debugPrint('NaverMap auth failed: $ex');
+        }
+      },
+    );
+  } else if (kDebugMode) {
+    debugPrint(
+      'NAVER_MAP_CLIENT_ID is missing. '
+      'Run with --dart-define or --dart-define-from-file to enable Naver Map.',
+    );
+  }
 
   // final firebaseOptions = switch (appFlavor) {
   //   'prod' => prod.DefaultFirebaseOptions.currentPlatform,
