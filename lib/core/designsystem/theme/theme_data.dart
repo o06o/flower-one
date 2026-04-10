@@ -162,7 +162,9 @@ extension FlowerTextThemeDefaultExtension on FlowerTextTheme {
   TextStyle get default8Medium => defaultTextStyleForSize(8.0).toMedium();
 
   // w400
-  TextStyle get hakgyo18Medium => hakgyoTextStyleForSize(20.0).toRegular();
+  TextStyle get hakgyo24Regular=> hakgyoTextStyleForSize(24.0).toRegular();
+
+  TextStyle get hakgyo20Regular => hakgyoTextStyleForSize(20.0).toRegular();
 
 
   TextStyle get default22Regular => defaultTextStyleForSize(22.0).toRegular();
@@ -204,6 +206,8 @@ extension FlowerTextThemeDefaultExtension on FlowerTextTheme {
 }
 
 extension FlowerTextThemeAlias on FlowerTextTheme {
+  TextStyle get headline1RegularHakgyo => hakgyo24Regular;
+
   TextStyle get headline1Medium => default20Medium;
   TextStyle get headline1MediumMulti => headline1Medium.copyWith(height: 1.6);
   TextStyle get headline1Regular => default20Regular;
@@ -218,7 +222,7 @@ extension FlowerTextThemeAlias on FlowerTextTheme {
   TextStyle get headline2RegularWhite => default18Regular.copyWith(color: textWhite);
   TextStyle get headline2RegularMulti => headline2Regular.copyWith(height: 1.6);
 
-  TextStyle get headline2RegularHakgyoMulti => hakgyo18Medium.copyWith(height: 1.6);
+  TextStyle get headline2RegularHakgyoMulti => hakgyo20Regular.copyWith(height: 1.6);
 
   TextStyle get headline3Medium => default24Medium;
   TextStyle get headline3GrayBlack => default24Medium.copyWith(color: textBlack);

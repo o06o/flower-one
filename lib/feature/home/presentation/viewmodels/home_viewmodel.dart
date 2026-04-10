@@ -12,41 +12,46 @@ class FlowerRecommendation {
   });
 }
 
+class SelectedTag {
+  final String type;
+  final String name;
+
+  const SelectedTag({
+    required this.type,
+    required this.name,
+  });
+}
+
 class HomeState {
-  final bool isLoadingTags;
   final bool isSending;
-  final List<String> tags;
   final List<FlowerRecommendation> resultFlowers;
+  final List<SelectedTag> selectedTags;
   final String? errorMessage;
 
   const HomeState({
-    required this.isLoadingTags,
     required this.isSending,
-    required this.tags,
     required this.resultFlowers,
+    required this.selectedTags,
     this.errorMessage,
   });
 
   const HomeState.initial()
     : this(
-        isLoadingTags: true,
         isSending: false,
-        tags: const [],
         resultFlowers: const [],
+        selectedTags: const [],
       );
 
   HomeState copyWith({
-    bool? isLoadingTags,
     bool? isSending,
-    List<String>? tags,
     List<FlowerRecommendation>? resultFlowers,
+    List<SelectedTag>? selectedTags,
     String? errorMessage,
   }) {
     return HomeState(
-      isLoadingTags: isLoadingTags ?? this.isLoadingTags,
       isSending: isSending ?? this.isSending,
-      tags: tags ?? this.tags,
       resultFlowers: resultFlowers ?? this.resultFlowers,
+      selectedTags: selectedTags ?? this.selectedTags,
       errorMessage: errorMessage,
     );
   }
@@ -54,40 +59,15 @@ class HomeState {
 
 final homeViewModelProvider =
     StateNotifierProvider.autoDispose<HomeViewModel, HomeState>((ref) {
-      return HomeViewModel(Supabase.instance.client)..loadTags();
+      return HomeViewModel(Supabase.instance.client);
     });
 
 class HomeViewModel extends StateNotifier<HomeState> {
-  static const String _tagTable = 'tags';
-  static const String _orderColumn = 'id';
   static const String _functionName = 'recommend-flower';
 
   final SupabaseClient _client;
 
   HomeViewModel(this._client) : super(const HomeState.initial());
-
-  Future<void> loadTags() async {
-    state = state.copyWith(isLoadingTags: true, errorMessage: null);
-    try {
-      final rows = await _client.from(_tagTable).select().order(_orderColumn);
-      final tags = rows
-          .map<String?>((row) {
-            final value = row['name'];
-            return value is String ? value : value?.toString();
-          })
-          .whereType<String>()
-          .map((value) => value.trim())
-          .where((value) => value.isNotEmpty)
-          .toList();
-
-      state = state.copyWith(isLoadingTags: false, tags: tags, errorMessage: null);
-    } catch (error) {
-      state = state.copyWith(
-        isLoadingTags: false,
-        errorMessage: '태그를 불러오지 못했어요. $error',
-      );
-    }
-  }
 
   Future<void> messageTest(String situation) async {
     final trimmed = situation.trim();
@@ -107,10 +87,12 @@ class HomeViewModel extends StateNotifier<HomeState> {
       "status: ${res.status}".logI();
       "data: ${res.data}".logI();
 
-      final parsed = _extractFlowers(res.data);
+      final parsedFlowers = _extractFlowers(res.data);
+      final parsedTags = _extractSelectedTags(res.data);
       state = state.copyWith(
         isSending: false,
-        resultFlowers: parsed,
+        resultFlowers: parsedFlowers,
+        selectedTags: parsedTags,
         errorMessage: null,
       );
     } catch (error) {
@@ -141,11 +123,40 @@ class HomeViewModel extends StateNotifier<HomeState> {
           ? rawReason.trim()
           : rawReason?.toString().trim();
 
-      if (name == null || name.isEmpty || reason == null || reason.isEmpty) {
+      if (reason == null || reason.isEmpty) {
         return null;
       }
 
-      return FlowerRecommendation(name: name, reason: reason);
+      return FlowerRecommendation(
+        name: (name == null || name.isEmpty) ? '추천 꽃' : name,
+        reason: reason,
+      );
     }).whereType<FlowerRecommendation>().toList();
+  }
+
+  List<SelectedTag> _extractSelectedTags(dynamic data) {
+    if (data is! Map) return const [];
+
+    final meta = data['meta'];
+    if (meta is! Map) return const [];
+
+    final selectedTags = meta['selected_tags'];
+    if (selectedTags is! List) return const [];
+
+    return selectedTags.map<SelectedTag?>((item) {
+      if (item is! Map) return null;
+
+      final rawType = item['type'];
+      final rawName = item['name'];
+      final type = rawType is String ? rawType.trim() : rawType?.toString().trim();
+      final name = rawName is String ? rawName.trim() : rawName?.toString().trim();
+
+      if (name == null || name.isEmpty) return null;
+
+      return SelectedTag(
+        type: (type == null || type.isEmpty) ? 'tag' : type,
+        name: name,
+      );
+    }).whereType<SelectedTag>().toList();
   }
 }

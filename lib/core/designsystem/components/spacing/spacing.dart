@@ -141,21 +141,21 @@ class SpacingVertical32 extends Spacing {
   }
 }
 
-class SpacingVertical40 extends Spacing {
-  const SpacingVertical40({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox(height: 40.0);
-  }
-}
-
 class SpacingVertical36 extends Spacing {
   const SpacingVertical36({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const SizedBox(height: 36.0);
+  }
+}
+
+class SpacingVertical40 extends Spacing {
+  const SpacingVertical40({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(height: 40.0);
   }
 }
 
