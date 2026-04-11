@@ -6,8 +6,10 @@ import 'package:flowerone/core/designsystem/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/designsystem/dialog/progress_dialog.dart';
+import '../../../../core/router/pages.dart';
 import '../viewmodels/home_viewmodel.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -33,6 +35,15 @@ class _HomePageState extends ConsumerState<HomePage> {
         LottieProgressDialog.show(context: context);
       } else {
         LottieProgressDialog.hide();
+      }
+
+      final hasNewResult =
+          (previous?.resultFlowers.isEmpty ?? true) && next.resultFlowers.isNotEmpty;
+      if (hasNewResult) {
+        context.pushNamed(
+          PAGES.recommend.screenName,
+          extra: next.resultFlowers,
+        );
       }
     });
     Timer(const Duration(seconds: 1), () {
@@ -80,63 +91,6 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                    if (state.selectedTags.isNotEmpty) ...[
-                      const Text('선택된 태그'),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: List.generate(
-                          state.selectedTags.length,
-                          (index) {
-                            final tag = state.selectedTags[index];
-                            return Chip(
-                              label: Text('${tag.name} (${tag.type})'),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                  if (state.resultFlowers.isNotEmpty) ...[
-                    const Text('결과'),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: List.generate(
-                        state.resultFlowers.length,
-                        (index) {
-                          final flower = state.resultFlowers[index];
-                          return Container(
-                            constraints: const BoxConstraints(minWidth: 160, maxWidth: 260),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Theme.of(context).dividerColor,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  flower.name,
-                                      style: Theme.of(context).textTheme.titleLarge,
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  flower.reason,
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
                   if (state.errorMessage != null) ...[
                     const SizedBox(height: 12),
                     Text(
