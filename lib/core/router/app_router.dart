@@ -1,6 +1,8 @@
 import 'package:flowerone/core/router/pages.dart';
 import 'package:flowerone/feature/garden/presentation/views/garden_page.dart';
+import 'package:flowerone/feature/letter/presentation/views/letter_page.dart';
 import 'package:flowerone/feature/map/presentation/views/map_page.dart';
+import 'package:flowerone/feature/recommend/presentation/views/recommend_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -104,6 +106,24 @@ final router = GoRouter(
           pageBuilder: (context, state) => FadeTransitionPage(
             key: state.pageKey,
             child: const GardenPage(),
+          ),
+        ),
+        GoRoute(
+          parentNavigatorKey: shellNavigatorKey,
+          name: PAGES.recommend.screenName,
+          path: PAGES.recommend.screenPath,
+          pageBuilder: (context, state) => FadeTransitionPage(
+            key: state.pageKey,
+            child: const RecommendPage(),
+          ),
+        ),
+        GoRoute(
+          parentNavigatorKey: shellNavigatorKey,
+          name: PAGES.letter.screenName,
+          path: PAGES.letter.screenPath,
+          pageBuilder: (context, state) => FadeTransitionPage(
+            key: state.pageKey,
+            child: const LetterPage(),
           ),
         ),
       ],

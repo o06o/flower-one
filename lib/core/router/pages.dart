@@ -7,6 +7,8 @@ enum PAGES {
   map,
   garden,
 
+  recommend,
+  letter,
   flowerDetail,
 
   my,
@@ -36,6 +38,10 @@ extension AppPageExtension on PAGES {
         return "/my";
       case PAGES.settings:
         return "/my/settings";
+      case PAGES.recommend:
+        return "/home/recommend";
+      case PAGES.letter:
+        return "/letter";
       case PAGES.main:
         return "/";
     }
@@ -61,6 +67,10 @@ extension AppPageExtension on PAGES {
         return "MY";
       case PAGES.settings:
         return "SETTINGS";
+      case PAGES.recommend:
+        return "RECOMMEND";
+      case PAGES.letter:
+        return "LETTER";
       case PAGES.main:
         return "MAIN";
     }
