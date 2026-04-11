@@ -42,6 +42,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/ic_garden.svg
   SvgGenImage get icGarden => const SvgGenImage('assets/icons/ic_garden.svg');
 
+  /// File path: assets/icons/ic_garden_marker.png
+  AssetGenImage get icGardenMarker => const AssetGenImage('assets/icons/ic_garden_marker.png');
+
   /// File path: assets/icons/ic_home.svg
   SvgGenImage get icHome => const SvgGenImage('assets/icons/ic_home.svg');
 
@@ -54,6 +57,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/ic_map_filled.svg
   SvgGenImage get icMapFilled => const SvgGenImage('assets/icons/ic_map_filled.svg');
 
+  /// File path: assets/icons/ic_map_marker.svg
+  SvgGenImage get icMapMarker => const SvgGenImage('assets/icons/ic_map_marker.svg');
+
   /// List of all assets
   List<dynamic> get values => [
     icGardenFilled,
@@ -61,10 +67,12 @@ class $AssetsIconsGen {
     floweroneLogoFilled,
     googleLogo,
     icGarden,
+    icGardenMarker,
     icHome,
     icHomeFilled,
     icMap,
     icMapFilled,
+    icMapMarker,
   ];
 }
 
