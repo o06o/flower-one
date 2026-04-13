@@ -36,12 +36,22 @@ class _RecommendPageState extends State<RecommendPage> {
   late final PageController _pageController;
   late final int _initialPage;
 
-  /// Supabase 연동 전까지 로컬만 (이름 기준 키)
+  /// 서버 `is_favorited` + 로컬 토글 반영 (`_favoriteKey` 기준)
   final Set<String> _favoriteFlowerKeys = {};
+
+  void _syncFavoritesFromFlowers(List<FlowerRecommendation> flowers) {
+    _favoriteFlowerKeys.clear();
+    for (final f in flowers) {
+      if (f.isFavorited) {
+        _favoriteFlowerKeys.add(_favoriteKey(f));
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    _syncFavoritesFromFlowers(widget.flowers);
     final n = widget.flowers.length;
     final mid = _kVirtualPageCount ~/ 2;
     _initialPage = n <= 0 ? 0 : mid - mid % n;
@@ -52,6 +62,14 @@ class _RecommendPageState extends State<RecommendPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FlutterNativeSplash.remove();
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant RecommendPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.flowers != widget.flowers) {
+      setState(() => _syncFavoritesFromFlowers(widget.flowers));
+    }
   }
 
   @override

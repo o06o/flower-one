@@ -10,6 +10,8 @@ class FlowerRecommendation {
   final String? meaning;
   final String reason;
   final String? imageUrl;
+  /// API `is_favorited`
+  final bool isFavorited;
 
   const FlowerRecommendation({
     this.flowerId,
@@ -17,6 +19,7 @@ class FlowerRecommendation {
     required this.reason,
     this.meaning,
     this.imageUrl,
+    this.isFavorited = false,
   });
 }
 
@@ -149,6 +152,16 @@ class HomeViewModel extends StateNotifier<HomeState> {
           ? rawImageUrl.trim()
           : rawImageUrl?.toString().trim();
 
+      final rawFavorited = item['is_favorited'];
+      var isFavorited = false;
+      if (rawFavorited is bool) {
+        isFavorited = rawFavorited;
+      } else if (rawFavorited is String) {
+        isFavorited = rawFavorited.toLowerCase() == 'true';
+      } else if (rawFavorited is num) {
+        isFavorited = rawFavorited != 0;
+      }
+
       if (reason == null || reason.isEmpty) {
         return null;
       }
@@ -159,6 +172,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
         meaning: meaning,
         reason: reason,
         imageUrl: (imageUrl == null || imageUrl.isEmpty) ? null : imageUrl,
+        isFavorited: isFavorited,
       );
     }).whereType<FlowerRecommendation>().toList();
   }
