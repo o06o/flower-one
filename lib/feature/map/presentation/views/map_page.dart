@@ -155,12 +155,6 @@ class _MapPageState extends State<MapPage> {
           captionAligns: const [NAlign.bottom],
           size: Size(56, 56),
         ),
-      if (_lastKnownMyLocation != null)
-        NMarker(
-          id: 'my_location',
-          position: _lastKnownMyLocation!,
-          caption: const NOverlayCaption(text: '내 위치'),
-        ),
     };
 
     await controller.clearOverlays(type: NOverlayType.marker);

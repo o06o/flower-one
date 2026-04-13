@@ -166,6 +166,8 @@ extension FlowerTextThemeDefaultExtension on FlowerTextTheme {
 
   TextStyle get hakgyo20Regular => hakgyoTextStyleForSize(20.0).toRegular();
 
+  TextStyle get hakgyo16Regular => hakgyoTextStyleForSize(16.0).toRegular();
+
 
   TextStyle get default22Regular => defaultTextStyleForSize(22.0).toRegular();
 
@@ -232,6 +234,8 @@ extension FlowerTextThemeAlias on FlowerTextTheme {
   TextStyle get main1Regular => default16Regular;
   TextStyle get main1RegularGrayBlack => default16Regular.copyWith(color: textBlack);
   TextStyle get main1RegularMulti => main1Regular.copyWith(height: 1.6);
+
+  TextStyle get main1RegularHakgyo => hakgyo16Regular;
 
   TextStyle get main2Medium => default14Medium;
   TextStyle get main2MediumBlack => default14Medium.copyWith(color: textBlack);

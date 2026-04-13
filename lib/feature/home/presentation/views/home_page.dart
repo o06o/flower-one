@@ -82,7 +82,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SpacingVertical48(),
-          Text("오늘 어떤 꽃 한송이를", style: context.textTheme.headline1RegularHakgyo.copyWith(),),
+          Text("오늘 어떤 꽃 한송이를", style: context.textTheme.headline1RegularHakgyo,),
           SpacingVertical8(),
           Text("선물하고 싶으세요?", style: context.textTheme.headline1RegularHakgyo.copyWith(color: context.colorScheme.primary),),
           SpacingVertical28(),

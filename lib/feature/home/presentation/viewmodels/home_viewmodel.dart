@@ -3,12 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FlowerRecommendation {
+  /// API `flower_id` (즐겨찾기 등 DB 연동용)
+  final int? flowerId;
   final String name;
+  /// 꽃말 (API: `meaning`, `flower_meaning` 등)
+  final String? meaning;
   final String reason;
+  final String? imageUrl;
 
   const FlowerRecommendation({
+    this.flowerId,
     required this.name,
     required this.reason,
+    this.meaning,
+    this.imageUrl,
   });
 }
 
@@ -116,20 +124,41 @@ class HomeViewModel extends StateNotifier<HomeState> {
     return flowers.map<FlowerRecommendation?>((item) {
       if (item is! Map) return null;
 
+      final rawFlowerId = item['flower_id'];
+      int? flowerId;
+      if (rawFlowerId is int) {
+        flowerId = rawFlowerId;
+      } else if (rawFlowerId is num) {
+        flowerId = rawFlowerId.toInt();
+      }
+
       final rawName = item['name'];
       final rawReason = item['reason'];
+      final rawMeaning = item['meaning'] ?? item['flower_meaning'];
+      final rawImageUrl = item['image_url'];
       final name = rawName is String ? rawName.trim() : rawName?.toString().trim();
       final reason = rawReason is String
           ? rawReason.trim()
           : rawReason?.toString().trim();
+      final meaningRaw = rawMeaning is String
+          ? rawMeaning.trim()
+          : rawMeaning?.toString().trim();
+      final meaning =
+          (meaningRaw == null || meaningRaw.isEmpty) ? null : meaningRaw;
+      final imageUrl = rawImageUrl is String
+          ? rawImageUrl.trim()
+          : rawImageUrl?.toString().trim();
 
       if (reason == null || reason.isEmpty) {
         return null;
       }
 
       return FlowerRecommendation(
+        flowerId: flowerId,
         name: (name == null || name.isEmpty) ? '추천 꽃' : name,
+        meaning: meaning,
         reason: reason,
+        imageUrl: (imageUrl == null || imageUrl.isEmpty) ? null : imageUrl,
       );
     }).whereType<FlowerRecommendation>().toList();
   }

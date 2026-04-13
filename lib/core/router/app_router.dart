@@ -3,6 +3,7 @@ import 'package:flowerone/feature/garden/presentation/views/garden_page.dart';
 import 'package:flowerone/feature/letter/presentation/views/letter_page.dart';
 import 'package:flowerone/feature/map/presentation/views/map_page.dart';
 import 'package:flowerone/feature/home/presentation/viewmodels/home_viewmodel.dart';
+import 'package:flowerone/feature/recommend/presentation/data/recommend_mock_data.dart';
 import 'package:flowerone/feature/recommend/presentation/views/recommend_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,7 +19,7 @@ final shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: PAGES.splash.screenPath,
+  initialLocation: PAGES.recommend.screenPath,
   requestFocus: false,
   redirect: (context, state) {
     // final uri = state.uri;
@@ -116,8 +117,8 @@ final router = GoRouter(
           pageBuilder: (context, state) {
             final extra = state.extra;
             final flowers = extra is List<FlowerRecommendation>
-                ? extra
-                : const <FlowerRecommendation>[];
+                ? List<FlowerRecommendation>.from(extra)
+                : kRecommendMockFlowers;
 
             return FadeTransitionPage(
               key: state.pageKey,
