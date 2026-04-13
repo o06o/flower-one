@@ -71,7 +71,7 @@ class _MapPageState extends State<MapPage> {
         'y': center.latitude.toString(),
         'x': center.longitude.toString(),
         'radius': '20000',
-        'size': '5',
+        'size': '10',
       },
     );
 

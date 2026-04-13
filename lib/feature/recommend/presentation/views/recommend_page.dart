@@ -1,14 +1,14 @@
+import 'package:flowerone/feature/recommend/presentation/views/components/recommend_flower_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../core/designsystem/components/container/bottom_nav_with_container.dart';
 import '../../../../core/designsystem/components/coponents.dart';
-import '../../../../core/resource/gen/assets.gen.dart';
-import '../../../../core/resource/gen/colors.gen.dart';
 import '../../../../core/designsystem/theme/theme_data.dart';
-import '../../../home/presentation/viewmodels/home_viewmodel.dart';
+import '../../../../core/model/model/flower_info_model.dart';
+
 
 /// 가상 페이지 수 (양끝까지 스크롤해도 충분히 길게 느껴지도록)
 const int _kVirtualPageCount = 0x8000;
@@ -20,8 +20,8 @@ const double _kViewportFraction = 0.72;
 const double _kScaleCenter = 1.0;
 const double _kScaleSide = 0.85;
 
-class RecommendPage extends StatefulWidget {
-  final List<FlowerRecommendation> flowers;
+class RecommendPage extends ConsumerStatefulWidget {
+  final List<FlowerInfoModel> flowers;
 
   const RecommendPage({
     super.key,
@@ -29,17 +29,16 @@ class RecommendPage extends StatefulWidget {
   });
 
   @override
-  State<RecommendPage> createState() => _RecommendPageState();
+  ConsumerState<RecommendPage> createState() => _RecommendPageState();
 }
 
-class _RecommendPageState extends State<RecommendPage> {
+class _RecommendPageState extends ConsumerState<RecommendPage> {
   late final PageController _pageController;
   late final int _initialPage;
 
-  /// 서버 `is_favorited` + 로컬 토글 반영 (`_favoriteKey` 기준)
   final Set<String> _favoriteFlowerKeys = {};
 
-  void _syncFavoritesFromFlowers(List<FlowerRecommendation> flowers) {
+  void _syncFavoritesFromFlowers(List<FlowerInfoModel> flowers) {
     _favoriteFlowerKeys.clear();
     for (final f in flowers) {
       if (f.isFavorited) {
@@ -78,7 +77,7 @@ class _RecommendPageState extends State<RecommendPage> {
     super.dispose();
   }
 
-  void _showRecommendReason(BuildContext context, FlowerRecommendation flower) {
+  void _showRecommendReason(BuildContext context, FlowerInfoModel flower) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
@@ -139,13 +138,13 @@ class _RecommendPageState extends State<RecommendPage> {
     );
   }
 
-  String _favoriteKey(FlowerRecommendation flower) {
+  String _favoriteKey(FlowerInfoModel flower) {
     final id = flower.flowerId;
     if (id != null) return 'id:$id';
     return 'name:${flower.name.trim()}';
   }
 
-  Future<void> _toggleFavorite(FlowerRecommendation flower) async {
+  Future<void> _toggleFavorite(FlowerInfoModel flower) async {
     final key = _favoriteKey(flower);
     final wasFavorite = _favoriteFlowerKeys.contains(key);
 
@@ -185,7 +184,7 @@ class _RecommendPageState extends State<RecommendPage> {
     }
   }
 
-  void _showLetterBottomSheet(BuildContext context, FlowerRecommendation flower) {
+  void _showLetterBottomSheet(BuildContext context, FlowerInfoModel flower) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
@@ -263,7 +262,7 @@ class _RecommendPageState extends State<RecommendPage> {
                   initialPage: _initialPage,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 2),
-                    child: _RecommendFlowerCard(
+                    child: RecommendFlowerCard(
                       flower: flower,
                       isFavorite:
                           _favoriteFlowerKeys.contains(_favoriteKey(flower)),
@@ -331,275 +330,6 @@ class _ScaledCarouselItem extends StatelessWidget {
         );
       },
       child: child,
-    );
-  }
-}
-
-class _RecommendFlowerCard extends StatelessWidget {
-  final FlowerRecommendation flower;
-  final bool isFavorite;
-  final VoidCallback onTap;
-  final VoidCallback onFavoriteTap;
-  final VoidCallback onLetterSheetTap;
-
-  const _RecommendFlowerCard({
-    required this.flower,
-    required this.isFavorite,
-    required this.onTap,
-    required this.onFavoriteTap,
-    required this.onLetterSheetTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final radius = BorderRadius.circular(20);
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: radius,
-            boxShadow: [
-              BoxShadow(
-                color: ColorName.black.withOpacity(0.10),
-                blurRadius: 28,
-                offset: const Offset(0, 14),
-                spreadRadius: -4,
-              ),
-              BoxShadow(
-                color: ColorName.primary.withOpacity(0.12),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: radius,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AspectRatio(
-                  aspectRatio: 3 / 4,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      _FlowerImage(imageUrl: flower.imageUrl),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.06),
-                              Colors.black.withOpacity(0.38),
-                            ],
-                            stops: const [0.45, 0.75, 1.0],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 16,
-                        right: 16,
-                        bottom: 12,
-                        child: Text(
-                          flower.name,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            shadows: const [
-                              Shadow(
-                                color: Colors.black45,
-                                blurRadius: 8,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ColoredBox(
-                    color: scheme.surface,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            padding: const EdgeInsets.fromLTRB(
-                              10,
-                              4,
-                              10,
-                              4,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _SectionLabel(
-                                  label: '꽃말',
-                                  accent: scheme.primary,
-                                  trailing: _TouchTarget42(
-                                    onPressed: onFavoriteTap,
-                                    child: Icon(
-                                      isFavorite
-                                          ? Icons.favorite_rounded
-                                          : Icons.favorite_border_rounded,
-                                      color: isFavorite
-                                          ? scheme.primary
-                                          : scheme.onSurface
-                                              .withOpacity(0.55),
-                                      size: 22,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  flower.meaning?.trim().isNotEmpty == true
-                                      ? flower.meaning!.trim()
-                                      : '—',
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    height: 1.45,
-                                    color: scheme.onSurface,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: _TouchTarget42(
-                              onPressed: onLetterSheetTap,
-                              child: Icon(
-                                Icons.keyboard_arrow_up_rounded,
-                                color:
-                                    scheme.onSurface.withOpacity(0.65),
-                                size: 26,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _TouchTarget42 extends StatelessWidget {
-  final VoidCallback onPressed;
-  final Widget child;
-
-  const _TouchTarget42({
-    required this.onPressed,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(21),
-        child: SizedBox(
-          width: 42,
-          height: 42,
-          child: Center(child: child),
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final String label;
-  final Color accent;
-  final Widget? trailing;
-
-  const _SectionLabel({
-    required this.label,
-    required this.accent,
-    this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 3,
-          height: 14,
-          decoration: BoxDecoration(
-            color: accent,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: theme.textTheme.labelLarge?.copyWith(
-            color: accent,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.2,
-          ),
-        ),
-        if (trailing != null) ...[
-          const Spacer(),
-          trailing!,
-        ],
-      ],
-    );
-  }
-}
-
-class _FlowerImage extends StatelessWidget {
-  final String? imageUrl;
-
-  const _FlowerImage({required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    final url = imageUrl?.trim();
-    if (url == null || url.isEmpty) {
-      return _fallback();
-    }
-
-    return Image.network(
-      url,
-      width: double.infinity,
-      height: double.infinity,
-      fit: BoxFit.fill,
-      errorBuilder: (_, __, ___) => _fallback(),
-    );
-  }
-
-  Widget _fallback() {
-    return ColoredBox(
-      color: ColorName.backgroundLightBlue,
-      child: Center(
-        child: Assets.icons.floweroneLogo.image(
-          width: 72,
-          height: 72,
-          fit: BoxFit.contain,
-        ),
-      ),
     );
   }
 }

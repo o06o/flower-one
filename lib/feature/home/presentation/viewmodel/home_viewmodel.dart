@@ -2,26 +2,9 @@ import 'package:flowerone/libraries/logger/logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class FlowerRecommendation {
-  /// API `flower_id` (즐겨찾기 등 DB 연동용)
-  final int? flowerId;
-  final String name;
-  /// 꽃말 (API: `meaning`, `flower_meaning` 등)
-  final String? meaning;
-  final String reason;
-  final String? imageUrl;
-  /// API `is_favorited`
-  final bool isFavorited;
+import '../../../../core/model/model/flower_info_model.dart';
 
-  const FlowerRecommendation({
-    this.flowerId,
-    required this.name,
-    required this.reason,
-    this.meaning,
-    this.imageUrl,
-    this.isFavorited = false,
-  });
-}
+
 
 class SelectedTag {
   final String type;
@@ -35,7 +18,7 @@ class SelectedTag {
 
 class HomeState {
   final bool isSending;
-  final List<FlowerRecommendation> resultFlowers;
+  final List<FlowerInfoModel> resultFlowers;
   final List<SelectedTag> selectedTags;
   final String? errorMessage;
 
@@ -55,7 +38,7 @@ class HomeState {
 
   HomeState copyWith({
     bool? isSending,
-    List<FlowerRecommendation>? resultFlowers,
+    List<FlowerInfoModel>? resultFlowers,
     List<SelectedTag>? selectedTags,
     String? errorMessage,
   }) {
@@ -115,7 +98,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     }
   }
 
-  List<FlowerRecommendation> _extractFlowers(dynamic data) {
+  List<FlowerInfoModel> _extractFlowers(dynamic data) {
     if (data is! Map) return const [];
 
     final result = data['result'];
@@ -124,7 +107,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
     final flowers = result['flowers'];
     if (flowers is! List) return const [];
 
-    return flowers.map<FlowerRecommendation?>((item) {
+    return flowers.map<FlowerInfoModel?>((item) {
       if (item is! Map) return null;
 
       final rawFlowerId = item['flower_id'];
@@ -166,7 +149,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
         return null;
       }
 
-      return FlowerRecommendation(
+      return FlowerInfoModel(
         flowerId: flowerId,
         name: (name == null || name.isEmpty) ? '추천 꽃' : name,
         meaning: meaning,
@@ -174,7 +157,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
         imageUrl: (imageUrl == null || imageUrl.isEmpty) ? null : imageUrl,
         isFavorited: isFavorited,
       );
-    }).whereType<FlowerRecommendation>().toList();
+    }).whereType<FlowerInfoModel>().toList();
   }
 
   List<SelectedTag> _extractSelectedTags(dynamic data) {

@@ -10,7 +10,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/designsystem/dialog/progress_dialog.dart';
 import '../../../../core/router/pages.dart';
-import '../viewmodels/home_viewmodel.dart';
+import '../viewmodel/home_viewmodel.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
