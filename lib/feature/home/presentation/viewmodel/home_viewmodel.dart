@@ -4,8 +4,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/model/model/flower_info_model.dart';
 
-
-
 class SelectedTag {
   final String type;
   final String name;
@@ -120,7 +118,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
 
       final rawName = item['name'];
       final rawReason = item['reason'];
-      final rawMeaning = item['meaning'] ?? item['flower_meaning'];
+      final rawMeaning = item['meaning'] ?? item['flower_meaning'] ?? item['description'];
       final rawImageUrl = item['image_url'];
       final name = rawName is String ? rawName.trim() : rawName?.toString().trim();
       final reason = rawReason is String

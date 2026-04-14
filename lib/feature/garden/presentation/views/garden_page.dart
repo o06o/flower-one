@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../core/designsystem/components/container/bottom_nav_with_container.dart';
 import '../../../../core/designsystem/components/coponents.dart';
 import '../../../../core/designsystem/theme/theme_data.dart';
 import '../../../../libraries/logger/logger.dart';
