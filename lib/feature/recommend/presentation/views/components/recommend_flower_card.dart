@@ -50,12 +50,14 @@ class RecommendFlowerCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: SingleChildScrollView(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 4,
+                            padding: const EdgeInsets.fromLTRB(
+                              16,
+                              10,
+                              4,
+                              10
                             ),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 FlowerItemHeaderSection(
                                   label: flower.name,

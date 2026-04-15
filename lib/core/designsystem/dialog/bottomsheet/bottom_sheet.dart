@@ -82,6 +82,7 @@ class CustomBottomSheet {
     return showModalBottomSheet(
       context: context,
       showDragHandle: true,
+      useRootNavigator: true,
       backgroundColor: backgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(

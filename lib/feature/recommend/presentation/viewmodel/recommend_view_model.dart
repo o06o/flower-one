@@ -9,6 +9,7 @@ import '../../../../core/model/model/flower_info_model.dart';
 import '../../../../core/model/result/ui_result.dart';
 import '../../data/mapper/flower_mapper.dart';
 import '../../domain/provider/get_recommend_flower_usecase_provider.dart';
+import '../data/recommend_mock_data.dart';
 import '../event/recommend_ui_event.dart';
 
 part 'recommend_view_model.freezed.dart';
@@ -42,7 +43,12 @@ class RecommendViewModel extends _$RecommendViewModel {
   Future<void> fetchRecommendations(String situation) async {
     final trimmed = situation.trim();
     if (trimmed.isEmpty) {
-      _addResult(Error(FlowerException(message: AppMessages.homeNetworkError)));
+      // _addResult(Error(FlowerException(message: AppMessages.homeNetworkError)));
+
+      state = state.copyWith(
+        flowers: kRecommendMockFlowers,
+        favoriteFlowerIds: {},
+      );
       return;
     }
 

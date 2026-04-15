@@ -10,7 +10,6 @@ import '../../../../core/designsystem/theme/theme_data.dart';
 import '../../../../core/designsystem/toast/toast_extension.dart';
 import '../../../../core/model/model/flower_info_model.dart';
 import '../../../../core/utils/error/ui_error_handler.dart';
-import '../../../../libraries/logger/logger.dart';
 import '../event/recommend_ui_event.dart';
 import '../../presentation/viewmodel/recommend_view_model.dart';
 import 'components/recommend_flower_card.dart';
@@ -35,21 +34,14 @@ class RecommendPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorTheme = context.colorScheme;
     final textTheme = context.textTheme;
     final viewModel = ref.read(recommendViewModelProvider.notifier);
     final state = ref.watch(recommendViewModelProvider);
     final favoriteIds = state.favoriteFlowerIds;
     final flowers = state.flowers;
-
-    // PageController 초기화
-    final n = flowers.length;
-    final mid = _kVirtualPageCount ~/ 2;
-    final initialPage = n <= 0 ? 0 : mid - mid % n;
-    final pageController = usePageController(
-      viewportFraction: _kViewportFraction,
-      initialPage: initialPage,
-    );
+    
+    // 초기 상태 관리 (첫 스크롤 전까지는 모든 카드 축소)
+    final hasInteracted = useState(false);
 
     // 초기화 및 이벤트 리스닝
     useEffect(() {
@@ -59,7 +51,44 @@ class RecommendPage extends HookConsumerWidget {
       return null;
     }, []);
 
-    // 이벤트 리스닝
+    // PageController 초기화 - flowers가 있을 때만 생성
+    final n = flowers.length;
+    // 3개 이하는 무한스크롤 없이, 초과하면 무한스크롤
+    final useInfiniteScroll = n > 3;
+    final mid = _kVirtualPageCount ~/ 2;
+    final infiniteInitialPage = n <= 0 ? 0 : mid - mid % n;
+    
+    final initialPage = useInfiniteScroll ? infiniteInitialPage : 0;
+    
+    final pageController = usePageController(
+      viewportFraction: _kViewportFraction,
+      initialPage: initialPage,
+      keys: [flowers.length], // flowers 길이가 변경되면 재생성
+    );
+    
+    useEffect(() {
+      void onPageChanged() {
+        if (!hasInteracted.value && pageController.hasClients) {
+          final currentPage = pageController.page ?? initialPage.toDouble();
+          if ((currentPage - initialPage.toDouble()).abs() > 0.1) {
+            hasInteracted.value = true;
+          }
+        }
+      }
+      
+      pageController.addListener(onPageChanged);
+      return () => pageController.removeListener(onPageChanged);
+    }, [pageController]);
+
+    ref.listen(
+      recommendViewModelProvider.select((state) => state.flowers),
+      (prev, next) {
+        if (next.isNotEmpty && (prev == null || prev.isEmpty)) {
+          hasInteracted.value = true;
+        }
+      },
+    );
+
     ref.listen(
       recommendViewModelProvider.select((state) => state.result),
       (prev, next) {
@@ -82,52 +111,6 @@ class RecommendPage extends HookConsumerWidget {
       },
     );
 
-    void showRecommendReason(FlowerInfoModel flower) {
-      final bottom = MediaQuery.paddingOf(context).bottom;
-
-      CustomBottomSheet.wrapShow(
-        context: context,
-        backgroundColor: colorTheme.white,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(24, 8, 24, bottom + 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                flower.name,
-                style: context.textTheme.headline1RegularHakgyo,
-              ),
-              SpacingHorizontal16(),
-              IntrinsicHeight(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ColorVerticalDivider(
-                      color: colorTheme.primary,
-                      width: 4,
-                      thickness: 4,
-                      radius: BorderRadiusGeometry.circular(10),
-                    ),
-                    SpacingHorizontal8(),
-                    Text(
-                      AppMessages.recommendReasonLabel,
-                      style: textTheme.headline2RegularHakgyo,
-                    ),
-                  ],
-                ),
-              ),
-              SpacingHorizontal10(),
-              Text(
-                flower.reason,
-                style: textTheme.main1RegularHakgyo,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     if (flowers.isEmpty && state.result is! Loading) {
       return const Center(child: Text(AppMessages.recommendEmpty));
     }
@@ -148,36 +131,39 @@ class RecommendPage extends HookConsumerWidget {
           ),
           SpacingVertical8(),
           Expanded(
-            child: PageView.builder(
-              controller: pageController,
-              clipBehavior: Clip.none,
-              itemCount: _kVirtualPageCount,
-              itemBuilder: (context, index) {
-                final flower = flowers[index % flowers.length];
-                return _ScaledCarouselItem(
-                  pageIndex: index,
-                  pageController: pageController,
-                  initialPage: initialPage,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 2),
-                    child: RecommendFlowerCard(
-                      flower: flower,
-                      isFavorite: flower.flowerId != null && 
-                          favoriteIds.contains(flower.flowerId!),
-                      onTap: () => showRecommendReason(flower),
-                      onFavoriteTap: () => viewModel.toggleFavoriteFlower(flower),
-                    ),
+            child: flowers.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : PageView.builder(
+                    controller: pageController,
+                    clipBehavior: Clip.none,
+                    // 3개 이하면 실제 갯수만, 초과하면 무한 스크롤
+                    itemCount: useInfiniteScroll ? _kVirtualPageCount : flowers.length,
+                    itemBuilder: (context, index) {
+                      final flower = flowers[index % flowers.length];
+                      return _ScaledCarouselItem(
+                        pageIndex: index,
+                        pageController: pageController,
+                        initialPage: initialPage,
+                        forceSmallScale: !hasInteracted.value,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 2),
+                          child: RecommendFlowerCard(
+                            flower: flower,
+                            isFavorite: flower.flowerId != null && 
+                                favoriteIds.contains(flower.flowerId!),
+                            onTap: () => _showRecommendReason(context, flower),
+                            onFavoriteTap: () => viewModel.toggleFavoriteFlower(flower),
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: colorTheme.primary,
-            ),
-            onPressed: () {},
-            child: const Text(AppMessages.recommendFindShopButton),
+          PrimaryFilledButton(
+            child: Text(AppMessages.recommendFindShopButton, style: textTheme.main1RegularHakgyo,),
+            onTap: (){
+
+            },
           ),
           SpacingVertical20(),
         ],
@@ -188,7 +174,6 @@ class RecommendPage extends HookConsumerWidget {
   void _handleEvent({required BuildContext context, required RecommendUiEvent event}) {
     switch (event) {
       case Completed():
-        "성공".logD();
         break;
       case Failed():
         context.showToast(message: "일시적인 오류입니다.");
@@ -197,18 +182,80 @@ class RecommendPage extends HookConsumerWidget {
         context.showToast(message: message);
     }
   }
+
+  void _showRecommendReason(BuildContext context,
+      FlowerInfoModel flower,) {
+    CustomBottomSheet.wrapShow(
+      context: context,
+      backgroundColor: context.colorScheme.white,
+      child: Expanded(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(24, 8, 24, MediaQuery.paddingOf(context).bottom + 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                flower.name,
+                style: context.textTheme.headline1RegularHakgyo,
+              ),
+              SpacingVertical16(),
+              IntrinsicHeight(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ColorVerticalDivider(
+                      color: context.colorScheme.primary,
+                      width: 4,
+                      thickness: 4,
+                      radius: BorderRadiusGeometry.circular(10),
+                    ),
+                    SpacingHorizontal8(),
+                    Text(
+                      AppMessages.recommendReasonLabel,
+                      style: context.textTheme.headline2RegularHakgyo,
+                    ),
+                  ],
+                ),
+              ),
+              SpacingVertical10(),
+              Text(
+                flower.reason,
+                style: context.textTheme.main1RegularHakgyo,
+              ),
+              SpacingVertical16(),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: PrimaryFilledButton(
+                    child: Text(AppMessages.recommendMakeLetterShopButton, style: context.textTheme.main1RegularHakgyo,),
+                    onTap: () {
+        
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _ScaledCarouselItem extends StatelessWidget {
   final int pageIndex;
   final PageController pageController;
   final int initialPage;
+  final bool forceSmallScale;
   final Widget child;
 
   const _ScaledCarouselItem({
     required this.pageIndex,
     required this.pageController,
     required this.initialPage,
+    this.forceSmallScale = false,
     required this.child,
   });
 
@@ -224,8 +271,11 @@ class _ScaledCarouselItem extends StatelessWidget {
         final delta = (page - pageIndex).abs();
         final t = (1.0 - delta.clamp(0.0, 1.0));
         final curved = Curves.easeOut.transform(t);
-        final scale = _kScaleSide + (_kScaleCenter - _kScaleSide) * curved;
-        final opacity = 0.72 + 0.28 * curved;
+        
+        final scale = forceSmallScale
+            ? _kScaleSide 
+            : _kScaleSide + (_kScaleCenter - _kScaleSide) * curved;
+        final opacity = forceSmallScale ? 0.72 : 0.72 + 0.28 * curved;
 
         return Center(
           child: Transform.scale(
