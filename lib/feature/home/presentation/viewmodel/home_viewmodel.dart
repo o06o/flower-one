@@ -2,6 +2,7 @@ import 'package:flowerone/libraries/logger/logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/constants/app_messages.dart';
 import '../../../../core/model/model/flower_info_model.dart';
 import '../../../../core/network/supabase/supabase_providers.dart';
 import '../../../../core/network/supabase/supabase_api.dart';
@@ -91,7 +92,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
       "오류 발견 ${error.toString()}".logE();
       state = state.copyWith(
         isSending: false,
-        errorMessage: '전송 중 오류가 발생했어요. $error',
+        errorMessage: '${AppMessages.homeNetworkError} $error',
       );
     }
   }

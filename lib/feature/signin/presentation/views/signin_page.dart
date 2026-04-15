@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/constants/app_messages.dart';
 import '../../../../core/designsystem/components/coponents.dart';
 import '../../../../core/designsystem/theme/theme_data.dart';
 import '../../../../core/network/supabase/supabase_providers.dart';
@@ -43,7 +44,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
       if (!mounted) return;
       context.go(PAGES.home.screenPath);
     } catch (error) {
-      _showFailToast('로그인 실패: $error');
+      _showFailToast('${AppMessages.signInFailedPrefix}$error');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -72,19 +73,19 @@ class _SignInPageState extends ConsumerState<SignInPage> {
             ),
           ),
           Text(
-            "꽃 한 송이로\n말로 전하기 어려운 마음\n전해보세요",
+            AppMessages.signInMessage,
             style: context.textTheme.headline2RegularHakgyoMulti,
             textAlign: TextAlign.center,
           ),
           SpacingVertical64(),
           GoogleSignInWidget(
             onSuccess: _signInToSupabase,
-            onFailed: () => _showFailToast('애플 로그인에 실패했어요.'),
+            onFailed: () => _showFailToast(AppMessages.signInAppleFailed),
           ),
           SpacingVertical16(),
           GoogleSignInWidget(
             onSuccess: _signInToSupabase,
-            onFailed: () => _showFailToast('구글 로그인에 실패했어요.'),
+            onFailed: () => _showFailToast(AppMessages.signInGoogleFailed),
           ),
           SpacingVertical48(),
         ],

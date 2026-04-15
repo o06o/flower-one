@@ -2,6 +2,7 @@ import 'package:flowerone/core/model/exception/flower_exception.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/constants/app_messages.dart';
 import '../../../../core/domain/provider/toggle_favorite_flower_usecase_provider.dart';
 import '../../../../core/model/model/flower_info_model.dart';
 import '../../../../core/model/result/ui_result.dart';
@@ -53,7 +54,7 @@ class RecommendViewModel extends _$RecommendViewModel {
       _addResult(Error(error));
     } else {
       _addResult(Error(FlowerException(
-        message: error?.toString() ?? "알 수 없는 오류가 발생했습니다.",
+        message: error?.toString() ?? AppMessages.unknownError,
       )));
     }
   }
@@ -74,7 +75,7 @@ class RecommendViewModel extends _$RecommendViewModel {
     // ID 없는 경우 에러 처리
     if (flowerId == null) {
       _addResult(
-        Success(ShowToast('이 꽃은 아직 즐겨찾기할 수 없어요')),
+        Success(ShowToast(AppMessages.favoriteNoId)),
       );
       return;
     }
@@ -99,7 +100,7 @@ class RecommendViewModel extends _$RecommendViewModel {
 
       _addResult(
         Success(
-          ShowToast(wasFavorite ? '즐겨찾기에서 해제했어요' : '즐겨찾기에 추가했어요'),
+          ShowToast(wasFavorite ? AppMessages.favoriteRemoved : AppMessages.favoriteAdded),
         ),
       );
     } catch (e) {

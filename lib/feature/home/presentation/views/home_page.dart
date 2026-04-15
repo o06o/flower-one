@@ -7,6 +7,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/app_messages.dart';
 import '../../../../core/designsystem/dialog/progress_dialog.dart';
 import '../../../../core/router/pages.dart';
 import '../viewmodel/home_viewmodel.dart';
@@ -81,9 +82,9 @@ class _HomePageState extends ConsumerState<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SpacingVertical48(),
-          Text("오늘 어떤 꽃 한송이를", style: context.textTheme.headline1RegularHakgyo,),
+          Text(AppMessages.homeTitle1, style: context.textTheme.headline1RegularHakgyo,),
           SpacingVertical8(),
-          Text("선물하고 싶으세요?", style: context.textTheme.headline1RegularHakgyo.copyWith(color: context.colorScheme.primary),),
+          Text(AppMessages.homeTitle2, style: context.textTheme.headline1RegularHakgyo.copyWith(color: context.colorScheme.primary),),
           SpacingVertical28(),
           Expanded(
             child: SingleChildScrollView(
@@ -111,7 +112,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             textInputAction: TextInputAction.newline,
 
             decoration: InputDecoration(
-              hintText: '상황을 입력해 주세요.',
+              hintText: AppMessages.homePlaceholder,
               border: inputBorder,
               enabledBorder: inputBorder,
               focusedBorder: inputBorder,
@@ -125,7 +126,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               backgroundColor: context.colorScheme.primary,
             ),
             onPressed: state.isSending ? null : _sendMessage,
-            child: const Text('추천받기'),
+            child: const Text(AppMessages.homeRecommendButton),
           ),
         ],
       ),

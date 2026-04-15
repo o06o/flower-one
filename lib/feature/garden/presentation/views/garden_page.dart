@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../../core/constants/app_messages.dart';
 import '../../../../core/designsystem/components/coponents.dart';
 import '../../../../core/designsystem/theme/theme_data.dart';
 import '../../../../core/network/supabase/supabase_api.dart';
@@ -133,7 +134,7 @@ class _GardenPageState extends ConsumerState<GardenPage> {
         children: [
           SpacingVertical20(),
           Text(
-            '나의 정원',
+            AppMessages.gardenTitle,
             style: context.textTheme.headline1RegularHakgyo,
           ),
           const SizedBox(height: 16),
@@ -153,14 +154,14 @@ class _GardenPageState extends ConsumerState<GardenPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '즐겨찾기를 불러오지 못했어요',
+              AppMessages.favoriteLoadFailed,
               style: context.textTheme.default15Medium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: _loadFavorites,
-              child: const Text('다시 시도'),
+              child: const Text(AppMessages.gardenRetry),
             ),
           ],
         ),
@@ -169,7 +170,7 @@ class _GardenPageState extends ConsumerState<GardenPage> {
     if (_rows.isEmpty) {
       return Center(
         child: Text(
-          '즐겨찾기한 꽃이 없어요',
+          AppMessages.favoriteEmpty,
           style: context.textTheme.default15Medium,
         ),
       );
@@ -213,16 +214,16 @@ class _FavoriteLeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final scheme = context.colorScheme;
     final url = imageUrl?.trim();
     if (url == null || url.isEmpty) {
       return CircleAvatar(
-        backgroundColor: scheme.primaryContainer,
-        child: Icon(Icons.local_florist_rounded, color: scheme.onPrimaryContainer),
+        backgroundColor: scheme.white,
+        child: Icon(Icons.local_florist_rounded, color: scheme.primary),
       );
     }
     return CircleAvatar(
-      backgroundColor: scheme.surfaceContainerHighest,
+      backgroundColor: scheme.white,
       backgroundImage: NetworkImage(url),
       onBackgroundImageError: (_, _) {},
       child: null,

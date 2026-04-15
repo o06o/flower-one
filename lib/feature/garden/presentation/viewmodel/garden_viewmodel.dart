@@ -2,6 +2,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/constants/app_messages.dart';
 import '../../../../core/model/exception/flower_exception.dart';
 import '../../../../core/model/model/flower_info_model.dart';
 import '../../../../core/model/result/ui_result.dart';
@@ -51,7 +52,7 @@ class GardenViewModel extends _$GardenViewModel {
       _addResult(Error(error));
     } else {
       _addResult(Error(FlowerException(
-        message: error?.toString() ?? "알 수 없는 오류가 발생했습니다.",
+        message: error?.toString() ?? AppMessages.unknownError,
       )));
     }
   }

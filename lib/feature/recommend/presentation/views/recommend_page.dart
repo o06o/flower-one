@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../../core/constants/app_messages.dart';
 import '../../../../core/designsystem/components/coponents.dart';
 import '../../../../core/designsystem/dialog/dialog.dart';
 import '../../../../core/designsystem/theme/theme_data.dart';
@@ -107,7 +108,7 @@ class RecommendPage extends HookConsumerWidget {
                     ),
                     SpacingHorizontal8(),
                     Text(
-                      '추천 이유',
+                      AppMessages.recommendReasonLabel,
                       style: textTheme.headline2RegularHakgyo,
                     ),
                   ],
@@ -125,7 +126,7 @@ class RecommendPage extends HookConsumerWidget {
     }
 
     if (flowers.isEmpty) {
-      return const Center(child: Text('추천 결과가 없어요.'));
+      return const Center(child: Text(AppMessages.recommendEmpty));
     }
 
     return BottomNavWithContainer(
@@ -134,12 +135,12 @@ class RecommendPage extends HookConsumerWidget {
         children: [
           SpacingVertical20(),
           Text(
-            '당신을 위한 추천',
+            AppMessages.recommendTitle,
             style: textTheme.headline1RegularHakgyo,
           ),
           SpacingVertical8(),
           Text(
-            '오늘의 상황을 담아 고른 세 가지 꽃입니다.',
+            AppMessages.recommendSubtitle,
             style: textTheme.main1RegularHakgyo,
           ),
           SpacingVertical8(),
@@ -173,7 +174,7 @@ class RecommendPage extends HookConsumerWidget {
               backgroundColor: colorTheme.primary,
             ),
             onPressed: () {},
-            child: const Text('주변 꽃집 찿기'),
+            child: const Text(AppMessages.recommendFindShopButton),
           ),
           SpacingVertical20(),
         ],
