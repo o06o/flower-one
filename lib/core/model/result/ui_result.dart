@@ -1,4 +1,4 @@
-import '../exception/exception.dart';
+import '../exception/flower_exception.dart';
 
 /// UI 레이어 결과 타입
 /// 
@@ -62,6 +62,7 @@ sealed class UiResult<T> {
 
 /// 성공 결과
 class Success<T> extends UiResult<T> {
+  @override
   final T data;
 
   const Success(this.data);

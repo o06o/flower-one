@@ -43,7 +43,7 @@ class LottieProgressWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Lottie.asset(
-        Assets.lotties.indicatorFlower,
+        Assets.lotties.lottieFlower,
         width: 100,
         height: 100,
         fit: BoxFit.contain,

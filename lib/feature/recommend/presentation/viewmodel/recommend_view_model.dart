@@ -1,7 +1,8 @@
-import 'package:flowerone/core/model/exception/exception.dart';
+import 'package:flowerone/core/model/exception/flower_exception.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/domain/provider/toggle_favorite_flower_usecase_provider.dart';
 import '../../../../core/model/model/flower_info_model.dart';
 import '../../../../core/model/result/ui_result.dart';
 import '../event/recommend_ui_event.dart';
@@ -16,6 +17,7 @@ abstract class RecommendState with _$RecommendState {
     @Default(false) bool isEditable,
     @Default(false) bool isLoading,
     @Default([]) List<FlowerInfoModel?> groupList,
+    @Default({}) Set<int> favoriteFlowerIds,
     UiResult<RecommendUiEvent>? result,
 }) = _RecommendState;
 
@@ -24,6 +26,7 @@ abstract class RecommendState with _$RecommendState {
       lastGroupNo: null,
       isEditable: false,
       groupList: [],
+      favoriteFlowerIds: {},
       result: null,
     );
   }
@@ -52,6 +55,55 @@ class RecommendViewModel extends _$RecommendViewModel {
       _addResult(Error(FlowerException(
         message: error?.toString() ?? "알 수 없는 오류가 발생했습니다.",
       )));
+    }
+  }
+
+  /// 초기 즐겨찾기 상태 설정
+  void initializeFavorites(List<FlowerInfoModel> flowers) {
+    final favoriteIds = flowers
+        .where((f) => f.isFavorited && f.flowerId != null)
+        .map((f) => f.flowerId!)
+        .toSet();
+    state = state.copyWith(favoriteFlowerIds: favoriteIds);
+  }
+
+  /// 즐겨찾기 토글 (네트워크 처리 담당)
+  Future<void> toggleFavoriteFlower(FlowerInfoModel flower) async {
+    final flowerId = flower.flowerId;
+
+    // ID 없는 경우 에러 처리
+    if (flowerId == null) {
+      _addResult(
+        Success(ShowToast('이 꽃은 아직 즐겨찾기할 수 없어요')),
+      );
+      return;
+    }
+
+    // 현재 즐겨찾기 상태 확인
+    final wasFavorite = state.favoriteFlowerIds.contains(flowerId);
+
+    try {
+      await ref.read(toggleFavoriteFlowerUseCaseProvider).call(
+            flowerId: flowerId,
+            isFavorite: wasFavorite,
+          );
+
+      // 성공 시 상태 업데이트
+      final updatedFavorites = Set<int>.from(state.favoriteFlowerIds);
+      if (wasFavorite) {
+        updatedFavorites.remove(flowerId);
+      } else {
+        updatedFavorites.add(flowerId);
+      }
+      state = state.copyWith(favoriteFlowerIds: updatedFavorites);
+
+      _addResult(
+        Success(
+          ShowToast(wasFavorite ? '즐겨찾기에서 해제했어요' : '즐겨찾기에 추가했어요'),
+        ),
+      );
+    } catch (e) {
+      _handleError(e);
     }
   }
 }

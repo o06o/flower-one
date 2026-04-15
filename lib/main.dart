@@ -10,9 +10,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/designsystem/theme/app_theme.dart';
+import 'core/network/supabase/supabase_config.dart';
 import 'core/resource/gen/colors.gen.dart';
 import 'core/router/app_router.dart';
 import 'core/storage/pref/pref_storage.dart';
@@ -38,17 +38,13 @@ bool _shouldIgnoreError(Object error) {
   return false;
 }
 
-const String _supabaseUrlFromEnv = String.fromEnvironment('SUPABASE_URL');
-const String _supabaseAnonKeyFromEnv = String.fromEnvironment(
-  'SUPABASE_ANON_KEY',
-);
 const String _naverMapClientIdFromEnv = String.fromEnvironment(
   'NAVER_MAP_CLIENT_ID',
 );
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await initializePackages();
 
@@ -105,16 +101,7 @@ Future<void> initializePackages() async {
     // DeviceOrientation.portraitDown,
   ]);
 
-  final supabaseUrl = _requireEnv(
-    name: 'SUPABASE_URL',
-    value: _supabaseUrlFromEnv,
-  );
-  final supabaseAnonKey = _requireEnv(
-    name: 'SUPABASE_ANON_KEY',
-    value: _supabaseAnonKeyFromEnv,
-  );
-
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  await SupabaseConfig.initialize();
 
   if (_naverMapClientIdFromEnv.isNotEmpty) {
     await FlutterNaverMap().init(
@@ -139,14 +126,6 @@ Future<void> initializePackages() async {
   // };
   //
   // await Firebase.initializeApp(options: firebaseOptions);
-}
-
-String _requireEnv({required String name, required String value}) {
-  if (value.isNotEmpty) return value;
-
-  throw StateError(
-    '$name is missing. Run with --dart-define or --dart-define-from-file.',
-  );
 }
 
 class MainApp extends StatefulWidget {

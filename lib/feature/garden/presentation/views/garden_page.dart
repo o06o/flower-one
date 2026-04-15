@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/designsystem/components/coponents.dart';
 import '../../../../core/designsystem/theme/theme_data.dart';
+import '../../../../core/network/supabase/supabase_api.dart';
+import '../../../../core/network/supabase/supabase_providers.dart';
 import '../../../../libraries/logger/logger.dart';
 
-class GardenPage extends StatefulWidget {
+class GardenPage extends ConsumerStatefulWidget {
   const GardenPage({super.key});
 
   @override
-  State<GardenPage> createState() => _GardenPageState();
+  ConsumerState<GardenPage> createState() => _GardenPageState();
 }
 
 class _FavoriteFlowerRow {
@@ -83,7 +85,7 @@ List<_FavoriteFlowerRow> _parseFavoriteRows(dynamic res) {
   return out;
 }
 
-class _GardenPageState extends State<GardenPage> {
+class _GardenPageState extends ConsumerState<GardenPage> {
   bool _loading = true;
   String? _error;
   List<_FavoriteFlowerRow> _rows = const [];
@@ -102,7 +104,9 @@ class _GardenPageState extends State<GardenPage> {
       });
     }
     try {
-      final res = await Supabase.instance.client.rpc('get_my_favorite_flowers');
+      final res = await ref
+          .read(supabaseApiProvider)
+          .rpc(SupabaseApi.rpcGetMyFavoriteFlowers);
       "res -> $res".logW();
       if (!mounted) return;
       setState(() {
@@ -175,7 +179,7 @@ class _GardenPageState extends State<GardenPage> {
       child: ListView.separated(
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: _rows.length,
-        separatorBuilder: (_, __) => const Divider(height: 1),
+        separatorBuilder: (_, _) => const Divider(height: 1),
         itemBuilder: (context, index) {
           final row = _rows[index];
           return ListTile(
@@ -220,7 +224,7 @@ class _FavoriteLeading extends StatelessWidget {
     return CircleAvatar(
       backgroundColor: scheme.surfaceContainerHighest,
       backgroundImage: NetworkImage(url),
-      onBackgroundImageError: (_, __) {},
+      onBackgroundImageError: (_, _) {},
       child: null,
     );
   }

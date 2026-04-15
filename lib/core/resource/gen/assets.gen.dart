@@ -88,8 +88,14 @@ class $AssetsLottiesGen {
   /// File path: assets/lotties/indicator_flower.json
   String get indicatorFlower => 'assets/lotties/indicator_flower.json';
 
+  /// File path: assets/lotties/lottie_flower.json
+  String get lottieFlower => 'assets/lotties/lottie_flower.json';
+
+  /// File path: assets/lotties/lottie_heart.json
+  String get lottieHeart => 'assets/lotties/lottie_heart.json';
+
   /// List of all assets
-  List<String> get values => [indicatorFlower];
+  List<String> get values => [indicatorFlower, lottieFlower, lottieHeart];
 }
 
 class Assets {

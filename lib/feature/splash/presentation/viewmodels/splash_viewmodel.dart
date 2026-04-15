@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/router/pages.dart';
+import '../../../../core/network/supabase/supabase_providers.dart';
 
 class SplashState {
   final bool isLoading;
@@ -17,7 +18,7 @@ class SplashState {
 
 final splashViewModelProvider =
     StateNotifierProvider.autoDispose<SplashViewModel, SplashState>((ref) {
-      return SplashViewModel(Supabase.instance.client.auth);
+      return SplashViewModel(ref.watch(supabaseAuthProvider));
     });
 
 class SplashViewModel extends StateNotifier<SplashState> {

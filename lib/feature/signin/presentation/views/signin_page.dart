@@ -2,23 +2,25 @@ import 'package:flowerone/libraries/logger/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/designsystem/components/coponents.dart';
 import '../../../../core/designsystem/theme/theme_data.dart';
+import '../../../../core/network/supabase/supabase_providers.dart';
 import '../../../../core/resource/gen/assets.gen.dart';
 import '../../../../core/router/pages.dart';
 import '../../../../core/utils/hero_tags.dart';
 import '../../../../libraries/google/widget/google_sign_in_widget.dart';
 
-class SignInPage extends StatefulWidget {
+class SignInPage extends ConsumerStatefulWidget {
   const SignInPage({super.key});
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  ConsumerState<SignInPage> createState() => _SignInPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInPageState extends ConsumerState<SignInPage> {
   bool _isLoading = false;
 
   Future<void> _signInToSupabase(
@@ -33,7 +35,7 @@ class _SignInPageState extends State<SignInPage> {
       "result => access : $accessToken // idToken $idToken // server $serverAuthCode"
           .logI();
 
-      await Supabase.instance.client.auth.signInWithIdToken(
+      await ref.read(supabaseAuthProvider).signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: accessToken,

@@ -1,30 +1,9 @@
-class FlowerException implements Exception {
-  final int? httpStatusCode;
-  final String? message;
+/// Common
+library;
+export 'flower_exception.dart';
+export 'network_exception.dart';
+export 'auth_exception.dart';
 
-  FlowerException({
-    this.httpStatusCode,
-    this.message = "An error occurred",
-  });
-
-  @override
-  String toString() {
-    return "$message $httpStatusCode";
-  }
-}
-
-class NetworkException extends FlowerException {
-  NetworkException({
-    super.httpStatusCode,
-    String super.message = "Network Error",
-  });
-}
-
-class AuthException extends FlowerException {
-  AuthException({
-    super.httpStatusCode,
-    String super.message = "Authentication Error",
-  });
-}
-
-
+/// API
+export 'api_exception.dart';
+export 'empty_data_exception.dart';

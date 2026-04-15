@@ -19,7 +19,7 @@ final shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
-  initialLocation: PAGES.splash.screenPath,
+  initialLocation: PAGES.recommend.screenPath,
   requestFocus: false,
   redirect: (context, state) {
     // final uri = state.uri;

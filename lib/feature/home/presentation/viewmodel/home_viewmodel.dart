@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/model/model/flower_info_model.dart';
+import '../../../../core/network/supabase/supabase_providers.dart';
+import '../../../../core/network/supabase/supabase_api.dart';
 
 class SelectedTag {
   final String type;
@@ -51,12 +53,10 @@ class HomeState {
 
 final homeViewModelProvider =
     StateNotifierProvider.autoDispose<HomeViewModel, HomeState>((ref) {
-      return HomeViewModel(Supabase.instance.client);
+      return HomeViewModel(ref.watch(supabaseClientProvider));
     });
 
 class HomeViewModel extends StateNotifier<HomeState> {
-  static const String _functionName = 'recommend-flower';
-
   final SupabaseClient _client;
 
   HomeViewModel(this._client) : super(const HomeState.initial());
@@ -70,7 +70,7 @@ class HomeViewModel extends StateNotifier<HomeState> {
 
     try {
       final res = await _client.functions.invoke(
-        _functionName,
+        SupabaseApi.edgeRecommendFlower,
         body: {
           'situation': trimmed,
         },

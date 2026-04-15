@@ -2,7 +2,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/model/exception/exception.dart';
+import '../../../../core/model/exception/flower_exception.dart';
 import '../../../../core/model/model/flower_info_model.dart';
 import '../../../../core/model/result/ui_result.dart';
 import '../event/garden_ui_event.dart';

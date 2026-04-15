@@ -2,6 +2,7 @@ import 'package:flowerone/core/designsystem/components/coponents.dart';
 import 'package:flowerone/core/designsystem/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../core/designsystem/components/button/heart_btn.dart';
 import '../../../../../core/model/model/flower_info_model.dart';
 import 'flower_image.dart';
 import 'flower_item_header_section.dart';
@@ -11,7 +12,6 @@ class RecommendFlowerCard extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback onTap;
   final VoidCallback onFavoriteTap;
-  final VoidCallback onLetterSheetTap;
 
   const RecommendFlowerCard({
     super.key,
@@ -19,7 +19,6 @@ class RecommendFlowerCard extends StatelessWidget {
     required this.isFavorite,
     required this.onTap,
     required this.onFavoriteTap,
-    required this.onLetterSheetTap,
   });
 
   @override
@@ -60,17 +59,10 @@ class RecommendFlowerCard extends StatelessWidget {
                               children: [
                                 FlowerItemHeaderSection(
                                   label: flower.name,
-                                  trailing: TouchTarget42(
-                                    onPressed: onFavoriteTap,
-                                    child: Icon(
-                                      isFavorite
-                                          ? Icons.favorite_rounded
-                                          : Icons.favorite_border_rounded,
-                                    )
-                                  )
+                                  trailing: HeartButton(size: Size(48, 48), onTap: onFavoriteTap, isSelected: false,)
                                 ),
                                 SpacingHorizontal8(),
-                                Text("꽃말: $desc"),
+                                Text("꽃말: $desc", style: context.textTheme.main1RegularHakgyo,),
                               ],
                             ),
                           ),
@@ -78,12 +70,9 @@ class RecommendFlowerCard extends StatelessWidget {
                         Center(
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child: TouchTarget42(
-                              onPressed: onLetterSheetTap,
-                              child: Icon(
-                                Icons.keyboard_arrow_up_rounded,
-                                size: 26,
-                              ),
+                            child: Icon(
+                              Icons.keyboard_arrow_up_rounded,
+                              size: 26,
                             ),
                           ),
                         ),
