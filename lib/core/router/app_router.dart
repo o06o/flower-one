@@ -1,9 +1,7 @@
-import 'package:flowerone/core/model/model/flower_info_model.dart';
 import 'package:flowerone/core/router/pages.dart';
 import 'package:flowerone/feature/garden/presentation/views/garden_page.dart';
 import 'package:flowerone/feature/letter/presentation/views/letter_page.dart';
 import 'package:flowerone/feature/map/presentation/views/map_page.dart';
-import 'package:flowerone/feature/recommend/presentation/data/recommend_mock_data.dart';
 import 'package:flowerone/feature/recommend/presentation/views/recommend_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -116,13 +114,11 @@ final router = GoRouter(
           path: PAGES.recommend.screenPath,
           pageBuilder: (context, state) {
             final extra = state.extra;
-            final flowers = extra is List<FlowerInfoModel>
-                ? List<FlowerInfoModel>.from(extra)
-                : kRecommendMockFlowers;
+            final userMessage = extra is String ? extra : '';
 
             return FadeTransitionPage(
               key: state.pageKey,
-              child: RecommendPage(flowers: flowers),
+              child: RecommendPage(userMessage: userMessage),
             );
           },
         ),

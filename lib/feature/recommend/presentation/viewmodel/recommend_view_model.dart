@@ -1,4 +1,5 @@
 import 'package:flowerone/core/model/exception/flower_exception.dart';
+import 'package:flowerone/libraries/logger/logger.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -6,6 +7,8 @@ import '../../../../core/constants/app_messages.dart';
 import '../../../../core/domain/provider/toggle_favorite_flower_usecase_provider.dart';
 import '../../../../core/model/model/flower_info_model.dart';
 import '../../../../core/model/result/ui_result.dart';
+import '../../data/mapper/flower_mapper.dart';
+import '../../domain/provider/get_recommend_flower_usecase_provider.dart';
 import '../event/recommend_ui_event.dart';
 
 part 'recommend_view_model.freezed.dart';
@@ -14,19 +17,14 @@ part 'recommend_view_model.g.dart';
 @freezed
 abstract class RecommendState with _$RecommendState {
   factory RecommendState({
-    int? lastGroupNo,
-    @Default(false) bool isEditable,
-    @Default(false) bool isLoading,
-    @Default([]) List<FlowerInfoModel?> groupList,
+    @Default([]) List<FlowerInfoModel> flowers,
     @Default({}) Set<int> favoriteFlowerIds,
     UiResult<RecommendUiEvent>? result,
 }) = _RecommendState;
 
   factory RecommendState.init() {
     return RecommendState(
-      lastGroupNo: null,
-      isEditable: false,
-      groupList: [],
+      flowers: [],
       favoriteFlowerIds: {},
       result: null,
     );
@@ -35,10 +33,50 @@ abstract class RecommendState with _$RecommendState {
 
 @Riverpod(keepAlive: false)
 class RecommendViewModel extends _$RecommendViewModel {
-
   @override
   RecommendState build() {
     return RecommendState.init();
+  }
+
+  /// 꽃 추천 받기
+  Future<void> fetchRecommendations(String situation) async {
+    final trimmed = situation.trim();
+    if (trimmed.isEmpty) {
+      _addResult(Error(FlowerException(message: AppMessages.homeNetworkError)));
+      return;
+    }
+
+    _addResult(const Loading(showProgress: true));
+
+    try {
+      final response = await ref.read(getRecommendFlowerUseCaseProvider).call(
+        situation: trimmed,
+      );
+
+      "response: ${response.result.flowers.length} flowers".logI();
+
+      // DTO를 Model로 변환
+      final flowers = response.result.flowers
+          .map((dto) => dto.toFlowerInfoModel())
+          .toList();
+      
+      // 초기 즐겨찾기 상태 설정
+      final favoriteIds = flowers
+          .where((f) => f.isFavorited && f.flowerId != null)
+          .map((f) => f.flowerId!)
+          .toSet();
+
+      state = state.copyWith(
+        flowers: flowers,
+        favoriteFlowerIds: favoriteIds,
+      );
+      
+      _addResult(const Loading(showProgress: false));
+    } catch (error) {
+      "오류 발견 ${error.toString()}".logE();
+      _addResult(const Loading(showProgress: false));
+      _handleError(error);
+    }
   }
 
   void _addResult(UiResult<RecommendUiEvent> result) {
@@ -57,15 +95,6 @@ class RecommendViewModel extends _$RecommendViewModel {
         message: error?.toString() ?? AppMessages.unknownError,
       )));
     }
-  }
-
-  /// 초기 즐겨찾기 상태 설정
-  void initializeFavorites(List<FlowerInfoModel> flowers) {
-    final favoriteIds = flowers
-        .where((f) => f.isFavorited && f.flowerId != null)
-        .map((f) => f.flowerId!)
-        .toSet();
-    state = state.copyWith(favoriteFlowerIds: favoriteIds);
   }
 
   /// 즐겨찾기 토글 (네트워크 처리 담당)

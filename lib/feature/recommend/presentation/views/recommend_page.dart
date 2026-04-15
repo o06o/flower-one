@@ -1,3 +1,4 @@
+import 'package:flowerone/core/model/result/ui_result.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -25,11 +26,11 @@ const double _kScaleCenter = 1.0;
 const double _kScaleSide = 0.85;
 
 class RecommendPage extends HookConsumerWidget {
-  final List<FlowerInfoModel> flowers;
+  final String userMessage;
 
   const RecommendPage({
     super.key,
-    required this.flowers,
+    required this.userMessage,
   });
 
   @override
@@ -37,7 +38,9 @@ class RecommendPage extends HookConsumerWidget {
     final colorTheme = context.colorScheme;
     final textTheme = context.textTheme;
     final viewModel = ref.read(recommendViewModelProvider.notifier);
-    final favoriteIds = ref.watch(recommendViewModelProvider).favoriteFlowerIds;
+    final state = ref.watch(recommendViewModelProvider);
+    final favoriteIds = state.favoriteFlowerIds;
+    final flowers = state.flowers;
 
     // PageController 초기화
     final n = flowers.length;
@@ -51,7 +54,7 @@ class RecommendPage extends HookConsumerWidget {
     // 초기화 및 이벤트 리스닝
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        viewModel.initializeFavorites(flowers);
+        viewModel.fetchRecommendations(userMessage);
       });
       return null;
     }, []);
@@ -125,7 +128,7 @@ class RecommendPage extends HookConsumerWidget {
       );
     }
 
-    if (flowers.isEmpty) {
+    if (flowers.isEmpty && state.result is! Loading) {
       return const Center(child: Text(AppMessages.recommendEmpty));
     }
 

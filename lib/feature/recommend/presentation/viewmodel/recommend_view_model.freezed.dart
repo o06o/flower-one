@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RecommendState {
 
- int? get lastGroupNo; bool get isEditable; bool get isLoading; List<FlowerInfoModel?> get groupList; Set<int> get favoriteFlowerIds; UiResult<RecommendUiEvent>? get result;
+ List<FlowerInfoModel> get flowers; Set<int> get favoriteFlowerIds; UiResult<RecommendUiEvent>? get result;
 /// Create a copy of RecommendState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $RecommendStateCopyWith<RecommendState> get copyWith => _$RecommendStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RecommendState&&(identical(other.lastGroupNo, lastGroupNo) || other.lastGroupNo == lastGroupNo)&&(identical(other.isEditable, isEditable) || other.isEditable == isEditable)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&const DeepCollectionEquality().equals(other.groupList, groupList)&&const DeepCollectionEquality().equals(other.favoriteFlowerIds, favoriteFlowerIds)&&(identical(other.result, result) || other.result == result));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RecommendState&&const DeepCollectionEquality().equals(other.flowers, flowers)&&const DeepCollectionEquality().equals(other.favoriteFlowerIds, favoriteFlowerIds)&&(identical(other.result, result) || other.result == result));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,lastGroupNo,isEditable,isLoading,const DeepCollectionEquality().hash(groupList),const DeepCollectionEquality().hash(favoriteFlowerIds),result);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(flowers),const DeepCollectionEquality().hash(favoriteFlowerIds),result);
 
 @override
 String toString() {
-  return 'RecommendState(lastGroupNo: $lastGroupNo, isEditable: $isEditable, isLoading: $isLoading, groupList: $groupList, favoriteFlowerIds: $favoriteFlowerIds, result: $result)';
+  return 'RecommendState(flowers: $flowers, favoriteFlowerIds: $favoriteFlowerIds, result: $result)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $RecommendStateCopyWith<$Res>  {
   factory $RecommendStateCopyWith(RecommendState value, $Res Function(RecommendState) _then) = _$RecommendStateCopyWithImpl;
 @useResult
 $Res call({
- int? lastGroupNo, bool isEditable, bool isLoading, List<FlowerInfoModel?> groupList, Set<int> favoriteFlowerIds, UiResult<RecommendUiEvent>? result
+ List<FlowerInfoModel> flowers, Set<int> favoriteFlowerIds, UiResult<RecommendUiEvent>? result
 });
 
 
@@ -62,13 +62,10 @@ class _$RecommendStateCopyWithImpl<$Res>
 
 /// Create a copy of RecommendState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? lastGroupNo = freezed,Object? isEditable = null,Object? isLoading = null,Object? groupList = null,Object? favoriteFlowerIds = null,Object? result = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? flowers = null,Object? favoriteFlowerIds = null,Object? result = freezed,}) {
   return _then(_self.copyWith(
-lastGroupNo: freezed == lastGroupNo ? _self.lastGroupNo : lastGroupNo // ignore: cast_nullable_to_non_nullable
-as int?,isEditable: null == isEditable ? _self.isEditable : isEditable // ignore: cast_nullable_to_non_nullable
-as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,groupList: null == groupList ? _self.groupList : groupList // ignore: cast_nullable_to_non_nullable
-as List<FlowerInfoModel?>,favoriteFlowerIds: null == favoriteFlowerIds ? _self.favoriteFlowerIds : favoriteFlowerIds // ignore: cast_nullable_to_non_nullable
+flowers: null == flowers ? _self.flowers : flowers // ignore: cast_nullable_to_non_nullable
+as List<FlowerInfoModel>,favoriteFlowerIds: null == favoriteFlowerIds ? _self.favoriteFlowerIds : favoriteFlowerIds // ignore: cast_nullable_to_non_nullable
 as Set<int>,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
 as UiResult<RecommendUiEvent>?,
   ));
@@ -155,10 +152,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? lastGroupNo,  bool isEditable,  bool isLoading,  List<FlowerInfoModel?> groupList,  Set<int> favoriteFlowerIds,  UiResult<RecommendUiEvent>? result)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<FlowerInfoModel> flowers,  Set<int> favoriteFlowerIds,  UiResult<RecommendUiEvent>? result)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RecommendState() when $default != null:
-return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.groupList,_that.favoriteFlowerIds,_that.result);case _:
+return $default(_that.flowers,_that.favoriteFlowerIds,_that.result);case _:
   return orElse();
 
 }
@@ -176,10 +173,10 @@ return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.groupLi
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? lastGroupNo,  bool isEditable,  bool isLoading,  List<FlowerInfoModel?> groupList,  Set<int> favoriteFlowerIds,  UiResult<RecommendUiEvent>? result)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<FlowerInfoModel> flowers,  Set<int> favoriteFlowerIds,  UiResult<RecommendUiEvent>? result)  $default,) {final _that = this;
 switch (_that) {
 case _RecommendState():
-return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.groupList,_that.favoriteFlowerIds,_that.result);case _:
+return $default(_that.flowers,_that.favoriteFlowerIds,_that.result);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +193,10 @@ return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.groupLi
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? lastGroupNo,  bool isEditable,  bool isLoading,  List<FlowerInfoModel?> groupList,  Set<int> favoriteFlowerIds,  UiResult<RecommendUiEvent>? result)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<FlowerInfoModel> flowers,  Set<int> favoriteFlowerIds,  UiResult<RecommendUiEvent>? result)?  $default,) {final _that = this;
 switch (_that) {
 case _RecommendState() when $default != null:
-return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.groupList,_that.favoriteFlowerIds,_that.result);case _:
+return $default(_that.flowers,_that.favoriteFlowerIds,_that.result);case _:
   return null;
 
 }
@@ -211,17 +208,14 @@ return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.groupLi
 
 
 class _RecommendState implements RecommendState {
-   _RecommendState({this.lastGroupNo, this.isEditable = false, this.isLoading = false, final  List<FlowerInfoModel?> groupList = const [], final  Set<int> favoriteFlowerIds = const {}, this.result}): _groupList = groupList,_favoriteFlowerIds = favoriteFlowerIds;
+   _RecommendState({final  List<FlowerInfoModel> flowers = const [], final  Set<int> favoriteFlowerIds = const {}, this.result}): _flowers = flowers,_favoriteFlowerIds = favoriteFlowerIds;
   
 
-@override final  int? lastGroupNo;
-@override@JsonKey() final  bool isEditable;
-@override@JsonKey() final  bool isLoading;
- final  List<FlowerInfoModel?> _groupList;
-@override@JsonKey() List<FlowerInfoModel?> get groupList {
-  if (_groupList is EqualUnmodifiableListView) return _groupList;
+ final  List<FlowerInfoModel> _flowers;
+@override@JsonKey() List<FlowerInfoModel> get flowers {
+  if (_flowers is EqualUnmodifiableListView) return _flowers;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_groupList);
+  return EqualUnmodifiableListView(_flowers);
 }
 
  final  Set<int> _favoriteFlowerIds;
@@ -243,16 +237,16 @@ _$RecommendStateCopyWith<_RecommendState> get copyWith => __$RecommendStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RecommendState&&(identical(other.lastGroupNo, lastGroupNo) || other.lastGroupNo == lastGroupNo)&&(identical(other.isEditable, isEditable) || other.isEditable == isEditable)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&const DeepCollectionEquality().equals(other._groupList, _groupList)&&const DeepCollectionEquality().equals(other._favoriteFlowerIds, _favoriteFlowerIds)&&(identical(other.result, result) || other.result == result));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RecommendState&&const DeepCollectionEquality().equals(other._flowers, _flowers)&&const DeepCollectionEquality().equals(other._favoriteFlowerIds, _favoriteFlowerIds)&&(identical(other.result, result) || other.result == result));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,lastGroupNo,isEditable,isLoading,const DeepCollectionEquality().hash(_groupList),const DeepCollectionEquality().hash(_favoriteFlowerIds),result);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_flowers),const DeepCollectionEquality().hash(_favoriteFlowerIds),result);
 
 @override
 String toString() {
-  return 'RecommendState(lastGroupNo: $lastGroupNo, isEditable: $isEditable, isLoading: $isLoading, groupList: $groupList, favoriteFlowerIds: $favoriteFlowerIds, result: $result)';
+  return 'RecommendState(flowers: $flowers, favoriteFlowerIds: $favoriteFlowerIds, result: $result)';
 }
 
 
@@ -263,7 +257,7 @@ abstract mixin class _$RecommendStateCopyWith<$Res> implements $RecommendStateCo
   factory _$RecommendStateCopyWith(_RecommendState value, $Res Function(_RecommendState) _then) = __$RecommendStateCopyWithImpl;
 @override @useResult
 $Res call({
- int? lastGroupNo, bool isEditable, bool isLoading, List<FlowerInfoModel?> groupList, Set<int> favoriteFlowerIds, UiResult<RecommendUiEvent>? result
+ List<FlowerInfoModel> flowers, Set<int> favoriteFlowerIds, UiResult<RecommendUiEvent>? result
 });
 
 
@@ -280,13 +274,10 @@ class __$RecommendStateCopyWithImpl<$Res>
 
 /// Create a copy of RecommendState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? lastGroupNo = freezed,Object? isEditable = null,Object? isLoading = null,Object? groupList = null,Object? favoriteFlowerIds = null,Object? result = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? flowers = null,Object? favoriteFlowerIds = null,Object? result = freezed,}) {
   return _then(_RecommendState(
-lastGroupNo: freezed == lastGroupNo ? _self.lastGroupNo : lastGroupNo // ignore: cast_nullable_to_non_nullable
-as int?,isEditable: null == isEditable ? _self.isEditable : isEditable // ignore: cast_nullable_to_non_nullable
-as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,groupList: null == groupList ? _self._groupList : groupList // ignore: cast_nullable_to_non_nullable
-as List<FlowerInfoModel?>,favoriteFlowerIds: null == favoriteFlowerIds ? _self._favoriteFlowerIds : favoriteFlowerIds // ignore: cast_nullable_to_non_nullable
+flowers: null == flowers ? _self._flowers : flowers // ignore: cast_nullable_to_non_nullable
+as List<FlowerInfoModel>,favoriteFlowerIds: null == favoriteFlowerIds ? _self._favoriteFlowerIds : favoriteFlowerIds // ignore: cast_nullable_to_non_nullable
 as Set<int>,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
 as UiResult<RecommendUiEvent>?,
   ));
