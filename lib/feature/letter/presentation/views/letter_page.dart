@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/designsystem/components/coponents.dart';
+
 class LetterPage extends StatelessWidget {
-  const LetterPage({super.key});
+  final String userMessage;
+  const LetterPage({super.key, required this.userMessage});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("LetterPage"),);
+    return DefaultContainer(child: Center(child: Text("LetterPage: $userMessage")));
   }
 }

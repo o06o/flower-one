@@ -1,6 +1,8 @@
 import 'package:flowerone/core/model/result/ui_result.dart';
+import 'package:flowerone/core/router/pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/app_messages.dart';
@@ -231,7 +233,7 @@ class RecommendPage extends HookConsumerWidget {
                   child: PrimaryFilledButton(
                     child: Text(AppMessages.recommendMakeLetterShopButton, style: context.textTheme.main1RegularHakgyo,),
                     onTap: () {
-        
+                      context.pushNamed(PAGES.letter.screenName, extra: userMessage);
                     },
                   ),
                 ),
@@ -244,6 +246,7 @@ class RecommendPage extends HookConsumerWidget {
   }
 }
 
+/// ::TODO 분리 필요
 class _ScaledCarouselItem extends StatelessWidget {
   final int pageIndex;
   final PageController pageController;
