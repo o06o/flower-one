@@ -70,12 +70,9 @@ final router = GoRouter(
       name: PAGES.letter.screenName,
       path: PAGES.letter.screenPath,
       pageBuilder: (context, state) {
-        final extra = state.extra;
-        final userMessage = extra is String ? extra : '';
-
         return FadeTransitionPage(
           key: state.pageKey,
-          child: LetterPage(userMessage: userMessage),
+          child: LetterPage(),
         );
       },
     ),

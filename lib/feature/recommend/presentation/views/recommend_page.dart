@@ -233,7 +233,13 @@ class RecommendPage extends HookConsumerWidget {
                   child: PrimaryFilledButton(
                     child: Text(AppMessages.recommendMakeLetterShopButton, style: context.textTheme.main1RegularHakgyo,),
                     onTap: () {
-                      context.pushNamed(PAGES.letter.screenName, extra: userMessage);
+                      context.pushNamed(
+                        PAGES.letter.screenName, 
+                        extra: {
+                          'message': userMessage,
+                          'flowerName': flower.name,
+                        },
+                      );
                     },
                   ),
                 ),

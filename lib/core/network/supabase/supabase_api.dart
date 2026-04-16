@@ -13,6 +13,7 @@ class SupabaseApi {
   /// - Edge Function: Supabase Dashboard > Edge Functions 이름과 동일
   /// - RPC: Postgres function 이름과 동일
   static const String edgeRecommendFlower = 'recommend-flower';
+  static const String edgeMakeLetter = 'make-letter';
 
   static const String rpcAddFavoriteFlower = 'add_favorite_flower';
   static const String rpcRemoveFavoriteFlower = 'remove_favorite_flower';
