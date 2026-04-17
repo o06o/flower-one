@@ -18,7 +18,7 @@ class FlowerItemHeaderSection extends StatelessWidget {
       children: [
         Text(
           label,
-          style: context.textTheme.headline1RegularHakgyo,
+          style: context.textTheme.headline2RegularHakgyo,
         ),
         if (trailing != null) ...[
           const Spacer(),

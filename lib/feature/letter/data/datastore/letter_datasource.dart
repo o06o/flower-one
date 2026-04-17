@@ -14,15 +14,16 @@ class LetterDatasource {
 
   /// 편지 생성하기
   Future<MakeLetterResponseDto> makeLetter({
-    required String message,
-    required String flowerName,
+    required int requestId,
+    required int flowerId,
+    required String recipient,
   }) async {
     final response = await _apiClient.invokeFunction(
       SupabaseApi.edgeMakeLetter,
       body: {
-        'requestId': 30,
-        'flowerId': 122,
-        'recipientType': "significant other",
+        'requestId': requestId,
+        'flowerId': flowerId,
+        'recipientType': recipient,
       },
     );
     return MakeLetterResponseDto.fromJson(response.data as Map<String, dynamic>);

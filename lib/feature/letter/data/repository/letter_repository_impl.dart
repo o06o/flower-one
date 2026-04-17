@@ -10,12 +10,14 @@ class LetterRepositoryImpl implements LetterRepository {
 
   @override
   Future<MakeLetterResponseDto> makeLetter({
-    required String message,
-    required String flowerName,
+    required int requestId,
+    required int flowerId,
+    required String recipient,
   }) async {
     return await _dataSource.makeLetter(
-      message: message,
-      flowerName: flowerName,
+      requestId: requestId,
+      flowerId: flowerId,
+      recipient: recipient,
     );
   }
 }

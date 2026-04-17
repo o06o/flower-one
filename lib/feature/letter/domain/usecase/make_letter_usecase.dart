@@ -7,12 +7,14 @@ class MakeLetterUseCase {
   MakeLetterUseCase(this._repository);
 
   Future<MakeLetterResponseDto> call({
-    required String message,
-    required String flowerName,
+    required int requestId,
+    required int flowerId,
+    required String recipient,
   }) async {
     return await _repository.makeLetter(
-      message: message,
-      flowerName: flowerName,
+      requestId: requestId,
+      flowerId: flowerId,
+      recipient: recipient,
     );
   }
 }

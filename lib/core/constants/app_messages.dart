@@ -30,8 +30,10 @@ class AppMessages {
   static const String recommendSubtitle = '오늘의 상황을 담아 고른 세 가지 꽃입니다.';
   static const String recommendReasonLabel = '추천 이유';
   static const String recommendEmpty = '추천 결과가 없어요.';
-  static const String recommendFindShopButton = '주변 꽃집 찿기';
+  static const String recommendFindShopButton = '근처 꽃집 찾기';
+  static const String recommendRetryButton = '다시 추천 받기';
   static const String recommendMakeLetterShopButton = '편지 쓰러 가기';
+  static const String recommendResetButton = '초기화';
 
   // ========== 정원 화면 ==========
   static const String gardenTitle = '나의 정원';

@@ -11,7 +11,7 @@ FlowerInfoResponseDto _$FlowerInfoResponseDtoFromJson(
 ) => FlowerInfoResponseDto(
   flowerId: (json['flower_id'] as num?)?.toInt(),
   name: json['name'] as String,
-  meaning: json['meaning'] as String?,
+  description: json['description'] as String?,
   reason: json['reason'] as String,
   imageUrl: json['image_url'] as String?,
   isFavorited: json['is_favorited'] as bool? ?? false,
@@ -22,7 +22,7 @@ Map<String, dynamic> _$FlowerInfoResponseDtoToJson(
 ) => <String, dynamic>{
   'flower_id': instance.flowerId,
   'name': instance.name,
-  'meaning': instance.meaning,
+  'description': instance.description,
   'reason': instance.reason,
   'image_url': instance.imageUrl,
   'is_favorited': instance.isFavorited,

@@ -70,9 +70,24 @@ final router = GoRouter(
       name: PAGES.letter.screenName,
       path: PAGES.letter.screenPath,
       pageBuilder: (context, state) {
+        final extra = state.extra;
+        final String userMessage;
+        final String flowerName;
+
+        if (extra is Map<String, dynamic>) {
+          userMessage = extra['message'] as String? ?? '';
+          flowerName = extra['flowerName'] as String? ?? '';
+        } else {
+          userMessage = '';
+          flowerName = '';
+        }
+
         return FadeTransitionPage(
           key: state.pageKey,
-          child: LetterPage(),
+          child: LetterPage(
+            userMessage: userMessage,
+            flowerName: flowerName,
+          ),
         );
       },
     ),

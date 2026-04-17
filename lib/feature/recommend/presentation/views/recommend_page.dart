@@ -10,7 +10,6 @@ import '../../../../core/designsystem/components/coponents.dart';
 import '../../../../core/designsystem/dialog/dialog.dart';
 import '../../../../core/designsystem/theme/theme_data.dart';
 import '../../../../core/designsystem/toast/toast_extension.dart';
-import '../../../../core/model/model/flower_info_model.dart';
 import '../../../../core/utils/error/ui_error_handler.dart';
 import '../event/recommend_ui_event.dart';
 import '../../presentation/viewmodel/recommend_view_model.dart';
@@ -41,7 +40,8 @@ class RecommendPage extends HookConsumerWidget {
     final state = ref.watch(recommendViewModelProvider);
     final favoriteIds = state.favoriteFlowerIds;
     final flowers = state.flowers;
-    
+    final selectedFlowerIndex = useState(0);
+
     // 초기 상태 관리 (첫 스크롤 전까지는 모든 카드 축소)
     final hasInteracted = useState(false);
 
@@ -76,11 +76,26 @@ class RecommendPage extends HookConsumerWidget {
             hasInteracted.value = true;
           }
         }
+
+        if (flowers.isNotEmpty && pageController.hasClients) {
+          final currentPage = pageController.page ?? initialPage.toDouble();
+          final currentFlowerIndex = currentPage.round() % flowers.length;
+          if (currentFlowerIndex != selectedFlowerIndex.value) {
+            selectedFlowerIndex.value = currentFlowerIndex;
+          }
+        }
       }
       
       pageController.addListener(onPageChanged);
       return () => pageController.removeListener(onPageChanged);
-    }, [pageController]);
+    }, [pageController, initialPage, flowers.length]);
+
+    useEffect(() {
+      if (flowers.isNotEmpty) {
+        selectedFlowerIndex.value = 0;
+      }
+      return null;
+    }, [flowers.length]);
 
     ref.listen(
       recommendViewModelProvider.select((state) => state.flowers),
@@ -117,6 +132,10 @@ class RecommendPage extends HookConsumerWidget {
       return const Center(child: Text(AppMessages.recommendEmpty));
     }
 
+    final selectedFlower = flowers.isEmpty
+        ? null
+        : flowers[selectedFlowerIndex.value.clamp(0, flowers.length - 1)];
+
     return BottomNavWithContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -141,7 +160,9 @@ class RecommendPage extends HookConsumerWidget {
                     // 3개 이하면 실제 갯수만, 초과하면 무한 스크롤
                     itemCount: useInfiniteScroll ? _kVirtualPageCount : flowers.length,
                     itemBuilder: (context, index) {
-                      final flower = flowers[index % flowers.length];
+                      final flowerIndex = index % flowers.length;
+                      final flower = flowers[flowerIndex];
+                      final isSelected = selectedFlowerIndex.value == flowerIndex;
                       return _ScaledCarouselItem(
                         pageIndex: index,
                         pageController: pageController,
@@ -149,24 +170,84 @@ class RecommendPage extends HookConsumerWidget {
                         forceSmallScale: !hasInteracted.value,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 2),
-                          child: RecommendFlowerCard(
-                            flower: flower,
-                            isFavorite: flower.flowerId != null && 
-                                favoriteIds.contains(flower.flowerId!),
-                            onTap: () => _showRecommendReason(context, flower),
-                            onFavoriteTap: () => viewModel.toggleFavoriteFlower(flower),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: isSelected
+                                    ? context.colorScheme.primary
+                                    : Colors.transparent,
+                                width: 2,
+                              ),
+                            ),
+                            child: RecommendFlowerCard(
+                              flower: flower,
+                              isFavorite: flower.flowerId != null &&
+                                  favoriteIds.contains(flower.flowerId!),
+                              onTap: () {
+                                selectedFlowerIndex.value = flowerIndex;
+                              },
+                              onFavoriteTap: () => viewModel.toggleFavoriteFlower(flower),
+                            ),
                           ),
                         ),
                       );
                     },
                   ),
           ),
-          PrimaryFilledButton(
-            child: Text(AppMessages.recommendFindShopButton, style: textTheme.main1RegularHakgyo,),
-            onTap: (){
-
-            },
-          ),
+          if (selectedFlower != null) ...[
+            SpacingVertical12(),
+            Text(
+              selectedFlower.name,
+              style: textTheme.headline2RegularHakgyo,
+            ),
+            if ((selectedFlower.meaning ?? '').isNotEmpty) ...[
+              SpacingVertical4(),
+              Text(
+                '꽃말: ${selectedFlower.meaning}',
+                style: textTheme.main1RegularHakgyo,
+              ),
+            ],
+            SpacingVertical8(),
+            Text(
+              '${AppMessages.recommendReasonLabel}: ${selectedFlower.reason}',
+              style: textTheme.main1RegularHakgyo,
+            ),
+            SpacingVertical16(),
+            PrimaryFilledButton(
+              child: Text(
+                AppMessages.recommendFindShopButton,
+                style: textTheme.main1RegularHakgyo,
+              ),
+              onTap: () {
+                context.goNamed(PAGES.map.screenName);
+              },
+            ),
+            SpacingVertical8(),
+            OutlinedButton(
+              onPressed: () => viewModel.fetchRecommendations(userMessage),
+              child: Text(
+                AppMessages.recommendRetryButton,
+                style: textTheme.main1RegularHakgyo,
+              ),
+            ),
+            SpacingVertical8(),
+            PrimaryFilledButton(
+              child: Text(
+                AppMessages.recommendMakeLetterShopButton,
+                style: textTheme.main1RegularHakgyo,
+              ),
+              onTap: () {
+                context.pushNamed(
+                  PAGES.letter.screenName,
+                  extra: {
+                    'message': userMessage,
+                    'flowerName': selectedFlower.name,
+                  },
+                );
+              },
+            ),
+          ],
           SpacingVertical20(),
         ],
       ),
@@ -185,71 +266,6 @@ class RecommendPage extends HookConsumerWidget {
     }
   }
 
-  void _showRecommendReason(BuildContext context,
-      FlowerInfoModel flower,) {
-    CustomBottomSheet.wrapShow(
-      context: context,
-      backgroundColor: context.colorScheme.white,
-      child: Expanded(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(24, 8, 24, MediaQuery.paddingOf(context).bottom + 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                flower.name,
-                style: context.textTheme.headline1RegularHakgyo,
-              ),
-              SpacingVertical16(),
-              IntrinsicHeight(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ColorVerticalDivider(
-                      color: context.colorScheme.primary,
-                      width: 4,
-                      thickness: 4,
-                      radius: BorderRadiusGeometry.circular(10),
-                    ),
-                    SpacingHorizontal8(),
-                    Text(
-                      AppMessages.recommendReasonLabel,
-                      style: context.textTheme.headline2RegularHakgyo,
-                    ),
-                  ],
-                ),
-              ),
-              SpacingVertical10(),
-              Text(
-                flower.reason,
-                style: context.textTheme.main1RegularHakgyo,
-              ),
-              SpacingVertical16(),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: SizedBox(
-                  width: double.infinity,
-                  child: PrimaryFilledButton(
-                    child: Text(AppMessages.recommendMakeLetterShopButton, style: context.textTheme.main1RegularHakgyo,),
-                    onTap: () {
-                      context.pushNamed(
-                        PAGES.letter.screenName, 
-                        extra: {
-                          'message': userMessage,
-                          'flowerName': flower.name,
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 /// ::TODO 분리 필요

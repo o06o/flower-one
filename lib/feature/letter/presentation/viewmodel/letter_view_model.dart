@@ -4,9 +4,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/constants/app_messages.dart';
-import '../../../../core/model/result/ui_result.dart';
-import '../../domain/provider/make_letter_usecase_provider.dart';
-import '../event/letter_ui_event.dart';
 
 part 'letter_view_model.freezed.dart';
 part 'letter_view_model.g.dart';
@@ -15,15 +12,13 @@ part 'letter_view_model.g.dart';
 abstract class LetterState with _$LetterState {
   factory LetterState({
     @Default('') String letterContent,
-    @Default(false) bool isLoading,
-    UiResult<LetterUiEvent>? result,
+    @Default(AsyncData<void>(null)) AsyncValue<void> requestState,
   }) = _LetterState;
 
   factory LetterState.init() {
     return LetterState(
       letterContent: '',
-      isLoading: false,
-      result: null,
+      requestState: const AsyncData<void>(null),
     );
   }
 }
@@ -36,48 +31,54 @@ class LetterViewModel extends _$LetterViewModel {
   }
 
   /// 편지 생성하기
-  Future<void> makeLetter() async {
+  Future<void> makeLetter({
+    required String message,
+    required String flowerName,
+  }) async {
+    final trimmed = message.trim();
+    if (trimmed.isEmpty) {
+      state = state.copyWith(
+        requestState: AsyncError<void>(
+          FlowerException(message: '메시지를 입력해주세요.'),
+          StackTrace.current,
+        ),
+      );
+      return;
+    }
 
-    _addResult(const Loading(showProgress: true));
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(requestState: const AsyncLoading<void>());
 
     try {
-      final response = await ref.read(makeLetterUseCaseProvider).call(
-        message: "30".toString(),
-        flowerName: "123".toString(),
-      );
+      // final response = await ref.read(makeLetterUseCaseProvider).call(
+      //   message: trimmed,
+      //   flowerName: flowerName,
+      // );
 
-      "response: ${response.result.letter}".logI();
-
-      state = state.copyWith(
-        letterContent: response.result.letter,
-        isLoading: false,
-      );
-
-      _addResult(const Loading(showProgress: false));
+      // "response: ${response.result.letter}".logI();
+      //
+      // state = state.copyWith(
+      //   letterContent: response.result.letter,
+      //   requestState: const AsyncData<void>(null),
+      // );
     } catch (error) {
       "오류 발견 ${error.toString()}".logE();
-      state = state.copyWith(isLoading: false);
-      _addResult(const Loading(showProgress: false));
-      _handleError(error);
+      state = state.copyWith(
+        requestState: AsyncError<void>(
+          _normalizeError(error),
+          StackTrace.current,
+        ),
+      );
     }
   }
 
-  void _addResult(UiResult<LetterUiEvent> result) {
-    state = state.copyWith(result: result);
+  void consumeRequestState() {
+    state = state.copyWith(requestState: const AsyncData<void>(null));
   }
 
-  void consumeResult() {
-    state = state.copyWith(result: null);
-  }
-
-  void _handleError(dynamic error) {
+  FlowerException _normalizeError(dynamic error) {
     if (error is FlowerException) {
-      _addResult(Error(error));
-    } else {
-      _addResult(Error(FlowerException(
-        message: error?.toString() ?? AppMessages.unknownError,
-      )));
+      return error;
     }
+    return FlowerException(message: error?.toString() ?? AppMessages.unknownError);
   }
 }

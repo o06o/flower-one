@@ -4,6 +4,7 @@ export 'bottom/bottom_nav_icon.dart';
 /// Button
 export 'button/heart_btn.dart';
 export 'button/primary_filled_button.dart';
+export 'button/white_filled_button.dart';
 
 /// Container
 export 'container/default_container.dart';

@@ -7,7 +7,8 @@ import '../../data/dto/make_letter_response_dto.dart';
 abstract class LetterRepository {
   /// 편지 생성하기
   Future<MakeLetterResponseDto> makeLetter({
-    required String message,
-    required String flowerName,
+    required int requestId,
+    required int flowerId,
+    required String recipient,
   });
 }

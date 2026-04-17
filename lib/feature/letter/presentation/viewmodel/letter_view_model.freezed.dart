@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LetterState {
 
- String get letterContent; bool get isLoading; UiResult<LetterUiEvent>? get result;
+ String get letterContent; AsyncValue<void> get requestState;
 /// Create a copy of LetterState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $LetterStateCopyWith<LetterState> get copyWith => _$LetterStateCopyWithImpl<Lett
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LetterState&&(identical(other.letterContent, letterContent) || other.letterContent == letterContent)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.result, result) || other.result == result));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LetterState&&(identical(other.letterContent, letterContent) || other.letterContent == letterContent)&&(identical(other.requestState, requestState) || other.requestState == requestState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,letterContent,isLoading,result);
+int get hashCode => Object.hash(runtimeType,letterContent,requestState);
 
 @override
 String toString() {
-  return 'LetterState(letterContent: $letterContent, isLoading: $isLoading, result: $result)';
+  return 'LetterState(letterContent: $letterContent, requestState: $requestState)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $LetterStateCopyWith<$Res>  {
   factory $LetterStateCopyWith(LetterState value, $Res Function(LetterState) _then) = _$LetterStateCopyWithImpl;
 @useResult
 $Res call({
- String letterContent, bool isLoading, UiResult<LetterUiEvent>? result
+ String letterContent, AsyncValue<void> requestState
 });
 
 
@@ -62,12 +62,11 @@ class _$LetterStateCopyWithImpl<$Res>
 
 /// Create a copy of LetterState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? letterContent = null,Object? isLoading = null,Object? result = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? letterContent = null,Object? requestState = null,}) {
   return _then(_self.copyWith(
 letterContent: null == letterContent ? _self.letterContent : letterContent // ignore: cast_nullable_to_non_nullable
-as String,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
-as UiResult<LetterUiEvent>?,
+as String,requestState: null == requestState ? _self.requestState : requestState // ignore: cast_nullable_to_non_nullable
+as AsyncValue<void>,
   ));
 }
 
@@ -152,10 +151,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String letterContent,  bool isLoading,  UiResult<LetterUiEvent>? result)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String letterContent,  AsyncValue<void> requestState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LetterState() when $default != null:
-return $default(_that.letterContent,_that.isLoading,_that.result);case _:
+return $default(_that.letterContent,_that.requestState);case _:
   return orElse();
 
 }
@@ -173,10 +172,10 @@ return $default(_that.letterContent,_that.isLoading,_that.result);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String letterContent,  bool isLoading,  UiResult<LetterUiEvent>? result)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String letterContent,  AsyncValue<void> requestState)  $default,) {final _that = this;
 switch (_that) {
 case _LetterState():
-return $default(_that.letterContent,_that.isLoading,_that.result);case _:
+return $default(_that.letterContent,_that.requestState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -193,10 +192,10 @@ return $default(_that.letterContent,_that.isLoading,_that.result);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String letterContent,  bool isLoading,  UiResult<LetterUiEvent>? result)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String letterContent,  AsyncValue<void> requestState)?  $default,) {final _that = this;
 switch (_that) {
 case _LetterState() when $default != null:
-return $default(_that.letterContent,_that.isLoading,_that.result);case _:
+return $default(_that.letterContent,_that.requestState);case _:
   return null;
 
 }
@@ -208,12 +207,11 @@ return $default(_that.letterContent,_that.isLoading,_that.result);case _:
 
 
 class _LetterState implements LetterState {
-   _LetterState({this.letterContent = '', this.isLoading = false, this.result});
+   _LetterState({this.letterContent = '', this.requestState = const AsyncData<void>(null)});
   
 
 @override@JsonKey() final  String letterContent;
-@override@JsonKey() final  bool isLoading;
-@override final  UiResult<LetterUiEvent>? result;
+@override@JsonKey() final  AsyncValue<void> requestState;
 
 /// Create a copy of LetterState
 /// with the given fields replaced by the non-null parameter values.
@@ -225,16 +223,16 @@ _$LetterStateCopyWith<_LetterState> get copyWith => __$LetterStateCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LetterState&&(identical(other.letterContent, letterContent) || other.letterContent == letterContent)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.result, result) || other.result == result));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LetterState&&(identical(other.letterContent, letterContent) || other.letterContent == letterContent)&&(identical(other.requestState, requestState) || other.requestState == requestState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,letterContent,isLoading,result);
+int get hashCode => Object.hash(runtimeType,letterContent,requestState);
 
 @override
 String toString() {
-  return 'LetterState(letterContent: $letterContent, isLoading: $isLoading, result: $result)';
+  return 'LetterState(letterContent: $letterContent, requestState: $requestState)';
 }
 
 
@@ -245,7 +243,7 @@ abstract mixin class _$LetterStateCopyWith<$Res> implements $LetterStateCopyWith
   factory _$LetterStateCopyWith(_LetterState value, $Res Function(_LetterState) _then) = __$LetterStateCopyWithImpl;
 @override @useResult
 $Res call({
- String letterContent, bool isLoading, UiResult<LetterUiEvent>? result
+ String letterContent, AsyncValue<void> requestState
 });
 
 
@@ -262,12 +260,11 @@ class __$LetterStateCopyWithImpl<$Res>
 
 /// Create a copy of LetterState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? letterContent = null,Object? isLoading = null,Object? result = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? letterContent = null,Object? requestState = null,}) {
   return _then(_LetterState(
 letterContent: null == letterContent ? _self.letterContent : letterContent // ignore: cast_nullable_to_non_nullable
-as String,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
-as UiResult<LetterUiEvent>?,
+as String,requestState: null == requestState ? _self.requestState : requestState // ignore: cast_nullable_to_non_nullable
+as AsyncValue<void>,
   ));
 }
 

@@ -12,11 +12,15 @@ RecommendFlowerResultDto _$RecommendFlowerResultDtoFromJson(
   flowers: (json['flowers'] as List<dynamic>)
       .map((e) => FlowerInfoResponseDto.fromJson(e as Map<String, dynamic>))
       .toList(),
+  requestId: (json['request_id'] as num).toInt(),
 );
 
 Map<String, dynamic> _$RecommendFlowerResultDtoToJson(
   RecommendFlowerResultDto instance,
-) => <String, dynamic>{'flowers': instance.flowers};
+) => <String, dynamic>{
+  'request_id': instance.requestId,
+  'flowers': instance.flowers,
+};
 
 RecommendFlowerResponseDto _$RecommendFlowerResponseDtoFromJson(
   Map<String, dynamic> json,

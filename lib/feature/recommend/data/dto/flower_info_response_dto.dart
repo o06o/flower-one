@@ -9,7 +9,7 @@ class FlowerInfoResponseDto {
   
   final String name;
   
-  final String? meaning;
+  final String? description;
   
   final String reason;
   
@@ -22,7 +22,7 @@ class FlowerInfoResponseDto {
   FlowerInfoResponseDto({
     this.flowerId,
     required this.name,
-    this.meaning,
+    this.description,
     required this.reason,
     this.imageUrl,
     this.isFavorited = false,

@@ -19,6 +19,7 @@ part 'recommend_view_model.g.dart';
 abstract class RecommendState with _$RecommendState {
   factory RecommendState({
     @Default([]) List<FlowerInfoModel> flowers,
+    @Default(-1) int requestId,
     @Default({}) Set<int> favoriteFlowerIds,
     UiResult<RecommendUiEvent>? result,
 }) = _RecommendState;
@@ -27,6 +28,7 @@ abstract class RecommendState with _$RecommendState {
     return RecommendState(
       flowers: [],
       favoriteFlowerIds: {},
+      requestId: -1,
       result: null,
     );
   }
@@ -65,7 +67,8 @@ class RecommendViewModel extends _$RecommendViewModel {
       final flowers = response.result.flowers
           .map((dto) => dto.toFlowerInfoModel())
           .toList();
-      
+
+      final requestId = response.result.requestId;
       // 초기 즐겨찾기 상태 설정
       final favoriteIds = flowers
           .where((f) => f.isFavorited && f.flowerId != null)
@@ -74,6 +77,7 @@ class RecommendViewModel extends _$RecommendViewModel {
 
       state = state.copyWith(
         flowers: flowers,
+        requestId: requestId,
         favoriteFlowerIds: favoriteIds,
       );
       

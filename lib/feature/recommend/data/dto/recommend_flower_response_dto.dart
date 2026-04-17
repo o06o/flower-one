@@ -6,10 +6,12 @@ part 'recommend_flower_response_dto.g.dart';
 
 @JsonSerializable()
 class RecommendFlowerResultDto {
+  @JsonKey(name: 'request_id')
+  final int requestId;
   final List<FlowerInfoResponseDto> flowers;
 
   RecommendFlowerResultDto({
-    required this.flowers,
+    required this.flowers, required this.requestId,
   });
 
   factory RecommendFlowerResultDto.fromJson(Map<String, dynamic> json) =>

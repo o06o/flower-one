@@ -4,13 +4,18 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/designsystem/components/coponents.dart';
 import '../../../../core/designsystem/dialog/dialog.dart';
+import '../../../../core/model/exception/flower_exception.dart';
 import '../../../../core/utils/error/ui_error_handler.dart';
-import '../event/letter_ui_event.dart';
 import '../viewmodel/letter_view_model.dart';
 
 class LetterPage extends HookConsumerWidget {
+  final String userMessage;
+  final String flowerName;
+
   const LetterPage({
-    super.key, 
+    super.key,
+    required this.userMessage,
+    required this.flowerName,
   });
 
   @override
@@ -20,34 +25,33 @@ class LetterPage extends HookConsumerWidget {
 
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        viewModel.makeLetter();
+        viewModel.makeLetter(
+          message: userMessage,
+          flowerName: flowerName,
+        );
       });
       return null;
-    }, []);
+    }, [userMessage, flowerName]);
 
     ref.listen(
-      letterViewModelProvider.select((state) => state.result),
+      letterViewModelProvider.select((state) => state.requestState),
       (prev, next) {
-        if (next != null) {
-          next.when(
-            success: (event) {
-              event.when(
-                showToast: (message) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(message)),
-                  );
-                },
-              );
-            },
-            error: (error) => UiErrorHandler.handle(context, error),
-            loading: (showProgress) {
-              showProgress
-                  ? LottieProgressDialog.show(context: context)
-                  : LottieProgressDialog.hide();
-            },
-          );
-          viewModel.consumeResult();
+        if (next.isLoading) {
+          LottieProgressDialog.show(context: context);
+          return;
         }
+
+        LottieProgressDialog.hide();
+
+        next.whenOrNull(
+          error: (error, _) {
+            final handledError = error is FlowerException
+                ? error
+                : FlowerException(message: error.toString());
+            UiErrorHandler.handle(context, handledError);
+            viewModel.consumeRequestState();
+          },
+        );
       },
     );
 
