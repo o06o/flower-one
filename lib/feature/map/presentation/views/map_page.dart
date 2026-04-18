@@ -9,7 +9,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../core/model/model/flower_shop_place_info_model.dart';
 import '../viewmodel/map_view_model.dart';
 import 'components/place_info_card.dart';
 
@@ -110,9 +109,9 @@ class MapPage extends HookConsumerWidget {
       const flowerIcon = NOverlayImage.fromAssetImage('assets/icons/ic_map_marker.png');
 
       await controller.clearOverlays(type: NOverlayType.marker);
-      
+
       final Map<String, NMarker> newMarkersMap = {};
-      
+
       for (var i = 0; i < state.places.length; i++) {
         final markerId = 'shop_${i + 1}';
         final marker = NMarker(
@@ -127,12 +126,12 @@ class MapPage extends HookConsumerWidget {
             "정보 -> ${state.places[i].name}".logD();
             return null;
           });
-        
+
         newMarkersMap[markerId] = marker;
       }
 
       markersMap.value = newMarkersMap;
-      
+
       if (newMarkersMap.isNotEmpty) {
         await controller.addOverlayAll(newMarkersMap.values.toSet());
       }
@@ -189,14 +188,6 @@ class MapPage extends HookConsumerWidget {
       return null;
     }, [state.selectedMarkerId]);
 
-    Future<void> openKakaoMap(FlowerShopPlaceInfoModel place) async {
-      if (place.placeUrl == null) {
-        context.showToast(message: '카카오맵 URL이 없습니다.');
-        return;
-      }
-      await UrlLauncherUtil.launchKakaoMap(context, place.placeUrl!);
-    }
-
     if (_naverMapClientIdFromEnv.isEmpty) {
       return const Center(
         child: Padding(
@@ -227,6 +218,7 @@ class MapPage extends HookConsumerWidget {
                 nightModeEnable: isDarkMode,
                 locationButtonEnable: false,
                 indoorEnable: true,
+                indoorLevelPickerEnable: true,
               ),
               onMapReady: (controller) async {
                 mapController.value = controller;
@@ -261,7 +253,13 @@ class MapPage extends HookConsumerWidget {
                 child: PlaceInfoCard(
                   place: state.selectedPlace!,
                   onClose: () => viewModel.clearSelection(),
-                  onOpenKakaoMap: () => openKakaoMap(state.selectedPlace!),
+                  onOpenKakaoMap: () async {
+                    var url = state.selectedPlace?.placeUrl;
+                    if (url == null) {
+                      context.showToast(message: '카카오맵 URL이 없습니다.');
+                    }
+                    await UrlLauncherUtil.launchExternalUrl(context, url!);
+                  },
                 ),
               ),
           ],
