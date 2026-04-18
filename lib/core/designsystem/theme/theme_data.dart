@@ -243,6 +243,7 @@ extension FlowerTextThemeAlias on FlowerTextTheme {
   TextStyle get main1RegularMulti => main1Regular.copyWith(height: 1.6);
 
   TextStyle get main1RegularHakgyo => hakgyo16Regular;
+  TextStyle get main1RegularHakgyoWhite => hakgyo16Regular.copyWith(color: textWhite);
   TextStyle get main2RegularHakgyo => hakgyo14Regular;
   TextStyle get subText2RegularHakgyo => hakgyo12Regular;
 

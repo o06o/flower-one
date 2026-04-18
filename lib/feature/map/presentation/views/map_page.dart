@@ -1,214 +1,202 @@
-import 'dart:convert';
-
+import 'package:flowerone/core/designsystem/theme/app_theme.dart';
+import 'package:flowerone/core/designsystem/toast/toast_extension.dart';
+import 'package:flowerone/core/model/exception/flower_exception.dart';
+import 'package:flowerone/core/utils/error/ui_error_handler.dart';
+import 'package:flowerone/core/utils/url/url_launcher_util.dart';
+import 'package:flowerone/libraries/logger/logger.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class MapPage extends StatefulWidget {
+import '../../../../core/model/model/flower_shop_place_info_model.dart';
+import '../viewmodel/map_view_model.dart';
+import 'components/place_info_card.dart';
+
+class MapPage extends HookConsumerWidget {
+  static const String _naverMapClientIdFromEnv = String.fromEnvironment('NAVER_MAP_CLIENT_ID');
+  static const NLatLng _seoulCityHall = NLatLng(37.5666, 126.979);
+
   const MapPage({super.key});
 
   @override
-  State<MapPage> createState() => _MapPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final viewModel = ref.read(mapViewModelProvider.notifier);
+    final state = ref.watch(mapViewModelProvider);
+    
+    final mapController = useState<NaverMapController?>(null);
+    final isFirstCameraIdle = useState(true);
+    final ignoreNextIdleSearch = useState(false);
+    final pendingSearchCenter = useState<NLatLng?>(null);
+    final currentLocationFuture = useMemoized(() => viewModel.getCurrentLocation());
+    final markersMap = useState<Map<String, NMarker>>({});
+    final previousSelectedMarkerId = useRef<String?>(null);
 
-class _MapPageState extends State<MapPage> {
-  static const String _naverMapClientIdFromEnv = String.fromEnvironment(
-    'NAVER_MAP_CLIENT_ID',
-  );
-  static const String _kakaoRestKeyFromEnv = String.fromEnvironment(
-    'KAKAO_REST_KEY',
-  );
-  static const double _searchMoveThresholdMeters = 700;
-  static const NLatLng _seoulCityHall = NLatLng(37.5666, 126.979);
-  late final Future<NLatLng?> _currentLocationFuture;
-  NaverMapController? _mapController;
-  NLatLng? _lastKnownMyLocation;
-  NLatLng? _lastSearchedCenter;
-  NLatLng? _pendingSearchCenter;
-  bool _isSearching = false;
-  bool _isFirstCameraIdle = true;
-  bool _ignoreNextIdleSearch = false;
-  bool _isMovingToMyLocation = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentLocationFuture = _resolveCurrentLocation();
-  }
-
-  Future<NLatLng?> _resolveCurrentLocation() async {
-    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return null;
-
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
+    useEffect(() {
       return null;
-    }
+    }, []);
 
-    final position = await Geolocator.getCurrentPosition();
-    final location = NLatLng(position.latitude, position.longitude);
-    _lastKnownMyLocation = location;
-    return location;
-  }
-
-  Future<List<_KakaoPlace>> _fetchNearbyFlowerShops({
-    required NLatLng center,
-  }) async {
-    final restKey = _kakaoRestKeyFromEnv.trim();
-    if (restKey.isEmpty) return const [];
-
-    final uri = Uri.https(
-      'dapi.kakao.com',
-      '/v2/local/search/keyword.json',
-      {
-        'query': '꽃집',
-        'y': center.latitude.toString(),
-        'x': center.longitude.toString(),
-        'radius': '20000',
-        'size': '10',
+    ref.listen(
+      mapViewModelProvider.select((state) => state.requestState),
+      (prev, next) {
+        next.whenOrNull(
+          error: (error, _) {
+            final handledError = error is FlowerException
+                ? error
+                : FlowerException(message: error.toString());
+            UiErrorHandler.handle(context, handledError);
+            viewModel.consumeRequestState();
+          },
+        );
       },
     );
 
-    final response = await http.get(
-      uri,
-      headers: {'Authorization': 'KakaoAK $restKey'},
-    );
+    Future<void> enqueueSearch(NLatLng center, {bool force = false}) async {
+      if (!force && !viewModel.shouldSearchByDistance(center)) return;
+      pendingSearchCenter.value = center;
 
-    if (response.statusCode != 200) {
-      debugPrint('Kakao local API failed: ${response.statusCode} ${response.body}');
-      return const [];
-    }
-
-    final dynamic decoded = jsonDecode(response.body);
-    if (decoded is! Map) return const [];
-    final documents = decoded['documents'];
-    if (documents is! List) return const [];
-
-    return documents.map<_KakaoPlace?>((item) {
-      if (item is! Map) return null;
-      final placeName = item['place_name'];
-      final x = item['x'];
-      final y = item['y'];
-      final name = placeName is String ? placeName.trim() : '';
-      final lng = double.tryParse(x?.toString() ?? '');
-      final lat = double.tryParse(y?.toString() ?? '');
-      if (name.isEmpty || lat == null || lng == null) return null;
-      return _KakaoPlace(name: name, position: NLatLng(lat, lng));
-    }).whereType<_KakaoPlace>().toList();
-  }
-
-  bool _shouldSearchByDistance(NLatLng center) {
-    final last = _lastSearchedCenter;
-    if (last == null) return true;
-    final distance = Geolocator.distanceBetween(
-      last.latitude,
-      last.longitude,
-      center.latitude,
-      center.longitude,
-    );
-    return distance >= _searchMoveThresholdMeters;
-  }
-
-  Future<void> _enqueueSearch(
-    NLatLng center, {
-    bool force = false,
-  }) async {
-    if (!force && !_shouldSearchByDistance(center)) return;
-    _pendingSearchCenter = center;
-
-    if (_isSearching) return;
-    while (_pendingSearchCenter != null) {
-      final target = _pendingSearchCenter!;
-      _pendingSearchCenter = null;
-      _isSearching = true;
-      try {
-        await _runSearch(target);
-        _lastSearchedCenter = target;
-      } finally {
-        _isSearching = false;
+      if (state.isSearching) return;
+      while (pendingSearchCenter.value != null) {
+        final target = pendingSearchCenter.value!;
+        pendingSearchCenter.value = null;
+        await viewModel.searchNearbyFlowerShops(target);
       }
     }
-  }
 
-  Future<void> _runSearch(NLatLng center) async {
-    final controller = _mapController;
-    if (controller == null) return;
+    Future<void> moveToMyLocationAndSearch() async {
+      if (state.isMovingToMyLocation) return;
+      final controller = mapController.value;
+      if (controller == null) return;
 
-    final places = await _fetchNearbyFlowerShops(center: center);
-    const flowerIcon = NOverlayImage.fromAssetImage(
-      'assets/icons/ic_map_marker.png'
-    );
+      viewModel.setMovingToMyLocation(true);
+      try {
+        final location = await viewModel.getCurrentLocation();
+        if (location == null) {
+          if (!context.mounted) return;
+          context.showToast(message: '위치 권한이 필요해요.');
+          return;
+        }
 
-    final Set<NMarker> markers = {
-      for (var i = 0; i < places.length; i++)
-        NMarker(
-          id: 'shop_${i + 1}',
-          position: places[i].position,
-          icon: flowerIcon,
-          caption: NOverlayCaption(text: places[i].name),
-          captionAligns: const [NAlign.bottom],
-          size: Size(56, 56),
-        ),
-    };
-
-    await controller.clearOverlays(type: NOverlayType.marker);
-    if (markers.isNotEmpty) {
-      await controller.addOverlayAll(markers);
+        final update = NCameraUpdate.scrollAndZoomTo(target: location, zoom: 15);
+        update.setAnimation(duration: const Duration(milliseconds: 600));
+        ignoreNextIdleSearch.value = true;
+        await controller.updateCamera(update);
+        await enqueueSearch(location, force: true);
+      } finally {
+        viewModel.setMovingToMyLocation(false);
+      }
     }
-  }
 
-  Future<void> _moveToMyLocationAndSearch() async {
-    if (_isMovingToMyLocation) return;
-    final controller = _mapController;
-    if (controller == null) return;
-
-    setState(() => _isMovingToMyLocation = true);
-    try {
-      final location = await _resolveCurrentLocation();
-      if (location == null) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('위치 권한이 필요해요.')),
-        );
+    Future<void> handleCameraIdle() async {
+      if (isFirstCameraIdle.value) {
+        isFirstCameraIdle.value = false;
         return;
       }
+      if (ignoreNextIdleSearch.value) {
+        ignoreNextIdleSearch.value = false;
+        return;
+      }
+      final controller = mapController.value;
+      if (controller == null) return;
 
-      final update = NCameraUpdate.scrollAndZoomTo(target: location, zoom: 15);
-      update.setAnimation(duration: const Duration(milliseconds: 600));
-      _ignoreNextIdleSearch = true;
-      await controller.updateCamera(update);
-      await _enqueueSearch(location, force: true);
-    } finally {
-      if (mounted) {
-        setState(() => _isMovingToMyLocation = false);
+      final cameraPosition = await controller.getCameraPosition();
+      await enqueueSearch(cameraPosition.target);
+    }
+
+    Future<void> initializeMarkers() async {
+      final controller = mapController.value;
+      if (controller == null) return;
+
+      const flowerIcon = NOverlayImage.fromAssetImage('assets/icons/ic_map_marker.png');
+
+      await controller.clearOverlays(type: NOverlayType.marker);
+      
+      final Map<String, NMarker> newMarkersMap = {};
+      
+      for (var i = 0; i < state.places.length; i++) {
+        final markerId = 'shop_${i + 1}';
+        final marker = NMarker(
+          id: markerId,
+          position: NLatLng(state.places[i].latitude, state.places[i].longitude),
+          icon: flowerIcon,
+          caption: NOverlayCaption(text: state.places[i].name),
+          captionAligns: const [NAlign.bottom],
+          size: const Size(56, 56),
+        )..setOnTapListener((tap) {
+            viewModel.selectPlace(state.places[i], tap.info.id);
+            "정보 -> ${state.places[i].name}".logD();
+            return null;
+          });
+        
+        newMarkersMap[markerId] = marker;
+      }
+
+      markersMap.value = newMarkersMap;
+      
+      if (newMarkersMap.isNotEmpty) {
+        await controller.addOverlayAll(newMarkersMap.values.toSet());
       }
     }
-  }
 
-  Future<void> _handleCameraIdle() async {
-    if (_isFirstCameraIdle) {
-      _isFirstCameraIdle = false;
-      return;
+    Future<void> updateMarkerSelection() async {
+      final controller = mapController.value;
+      if (controller == null) return;
+
+      const selectedFlowerIcon = NOverlayImage.fromAssetImage('assets/icons/ic_map_marker_on.png');
+
+      final currentSelectedId = state.selectedMarkerId;
+      final prevSelectedId = previousSelectedMarkerId.value;
+
+      // 이전 선택 오버레이 제거
+      if (prevSelectedId != null) {
+        try {
+          final prevOverlayId = '${prevSelectedId}_selected';
+          await controller.deleteOverlay(NOverlayInfo(id: prevOverlayId, type: NOverlayType.marker));
+        } catch (e) {
+          // 오버레이가 없으면 무시
+        }
+      }
+
+      // 현재 선택 마커 위에 선택 오버레이 추가
+      if (currentSelectedId != null && markersMap.value.containsKey(currentSelectedId)) {
+        final currentMarker = markersMap.value[currentSelectedId]!;
+        final selectedOverlay = NMarker(
+          id: '${currentSelectedId}_selected',
+          position: currentMarker.position,
+          icon: selectedFlowerIcon,
+          size: const Size(56, 56),
+        );
+        
+        await controller.addOverlay(selectedOverlay);
+      }
+
+      previousSelectedMarkerId.value = currentSelectedId;
     }
-    if (_ignoreNextIdleSearch) {
-      _ignoreNextIdleSearch = false;
-      return;
+
+    // places가 변경되면 전체 마커 재생성
+    useEffect(() {
+      if (state.places.isNotEmpty) {
+        initializeMarkers();
+      }
+      return null;
+    }, [state.places]);
+
+    // 선택이 변경되면 해당 마커만 업데이트
+    useEffect(() {
+      if (markersMap.value.isNotEmpty) {
+        updateMarkerSelection();
+      }
+      return null;
+    }, [state.selectedMarkerId]);
+
+    Future<void> openKakaoMap(FlowerShopPlaceInfoModel place) async {
+      if (place.placeUrl == null) {
+        context.showToast(message: '카카오맵 URL이 없습니다.');
+        return;
+      }
+      await UrlLauncherUtil.launchKakaoMap(context, place.placeUrl!);
     }
-    final controller = _mapController;
-    if (controller == null) return;
 
-    final cameraPosition = await controller.getCameraPosition();
-    await _enqueueSearch(cameraPosition.target);
-  }
-
-  @override
-  Widget build(BuildContext context) {
     if (_naverMapClientIdFromEnv.isEmpty) {
       return const Center(
         child: Padding(
@@ -222,12 +210,12 @@ class _MapPageState extends State<MapPage> {
     }
 
     return FutureBuilder<NLatLng?>(
-      future: _currentLocationFuture,
+      future: currentLocationFuture,
       builder: (context, snapshot) {
-        final currentLocation = snapshot.data;
-        final initialTarget = currentLocation ?? _seoulCityHall;
+        final initialTarget = snapshot.data ?? _seoulCityHall;
         final brightness = MediaQuery.of(context).platformBrightness;
         final isDarkMode = brightness == Brightness.dark;
+        
         return Stack(
           children: [
             NaverMap(
@@ -241,43 +229,44 @@ class _MapPageState extends State<MapPage> {
                 indoorEnable: true,
               ),
               onMapReady: (controller) async {
-                _mapController = controller;
-                _lastKnownMyLocation = currentLocation;
+                mapController.value = controller;
                 controller.setLocationTrackingMode(NLocationTrackingMode.follow);
               },
               onCameraIdle: () {
-                _handleCameraIdle();
+                handleCameraIdle();
               },
             ),
             Positioned(
               right: 16,
               bottom: 20,
               child: FloatingActionButton(
+                backgroundColor: context.colorScheme.white,
                 heroTag: 'move_to_my_location',
                 mini: true,
-                onPressed: _isMovingToMyLocation ? null : _moveToMyLocationAndSearch,
-                child: _isMovingToMyLocation
+                onPressed: state.isMovingToMyLocation ? null : moveToMyLocationAndSearch,
+                child: state.isMovingToMyLocation
                     ? const SizedBox(
                         width: 18,
                         height: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Icons.my_location),
+                    : Icon(Icons.my_location, color: context.colorScheme.primary),
               ),
             ),
+            if (state.selectedPlace != null)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: PlaceInfoCard(
+                  place: state.selectedPlace!,
+                  onClose: () => viewModel.clearSelection(),
+                  onOpenKakaoMap: () => openKakaoMap(state.selectedPlace!),
+                ),
+              ),
           ],
         );
       },
     );
   }
-}
-
-class _KakaoPlace {
-  final String name;
-  final NLatLng position;
-
-  const _KakaoPlace({
-    required this.name,
-    required this.position,
-  });
 }
