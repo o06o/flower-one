@@ -19,14 +19,14 @@ class GardenPage extends HookConsumerWidget {
 
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        viewModel.loadMockData();
+        viewModel.loadGardenData();
       });
       return null;
     }, []);
 
     return BottomNavWithContainer(
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SpacingVertical12(),
           Text(
@@ -73,7 +73,10 @@ class GardenPage extends HookConsumerWidget {
                     },
                   ),
                   SpacingVertical20(),
-                  const _SectionHeader(icon: Icons.mail_rounded, title: '편지 기록'),
+                  const _SectionHeader(
+                    icon: Icons.mail_rounded,
+                    title: '편지 기록',
+                  ),
                   SpacingVertical12(),
                   SizedBox(
                     height: 188,
@@ -276,8 +279,9 @@ class _LetterCard extends StatelessWidget {
       child: Stack(
         children: [
           ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: _NetworkImageBox(url: data.backgroundImageUrl,width: 140,),),
+            borderRadius: BorderRadius.circular(20),
+            child: _NetworkImageBox(url: data.backgroundImageUrl, width: 140),
+          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
@@ -292,11 +296,13 @@ class _LetterCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             alignment: Alignment.center,
-            child: Text(
-              data.preview,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.main2RegularHakgyo,
+            child: OutlinedText(
+              strokeWidth: 2,
+              strokeColor: context.colorScheme.white,
+              child: Text(
+                data.preview,
+                style: context.textTheme.main2RegularHakgyo,
+              ),
             ),
           ),
           Positioned(
@@ -353,8 +359,8 @@ class _NetworkImageBox extends StatelessWidget {
       width: width,
       height: height,
       fit: fit,
-      placeholder: (_, __) => _fallback(colorScheme, width, height),
-      errorWidget: (_, __, ___) => _fallback(colorScheme, width, height),
+      placeholder: (_, _) => _fallback(colorScheme, width, height),
+      errorWidget: (_, _, _) => _fallback(colorScheme, width, height),
     );
   }
 

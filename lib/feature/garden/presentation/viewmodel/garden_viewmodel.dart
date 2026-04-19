@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/constants/app_messages.dart';
 import '../../../../core/model/exception/flower_exception.dart';
 import '../../../../core/model/result/ui_result.dart';
+import '../../domain/provider/garden_providers.dart';
 import '../data/garden_mock_data.dart';
 import '../event/garden_ui_event.dart';
 import '../model/garden_section_item_model.dart';
@@ -41,16 +42,37 @@ class GardenViewModel extends _$GardenViewModel {
     state = state.copyWith(result: null);
   }
 
-  Future<void> loadMockData() async {
+  Future<void> loadGardenData() async {
     state = state.copyWith(isLoading: true);
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+    try {
+      final favorites = await ref
+          .read(getGardenFavoritesUseCaseProvider)
+          .call();
+      final favoriteItems = favorites
+          .map(
+            (item) => GardenFavoriteFlowerItemModel(
+              name: item.name,
+              meaning: item.meaning,
+              imageUrl: item.imageUrl,
+            ),
+          )
+          .toList();
 
-    state = state.copyWith(
-      isLoading: false,
-      favoriteFlowers: kGardenMockFavoriteFlowers,
-      situationRecords: kGardenMockSituationRecords,
-      letterRecords: kGardenMockLetterRecords,
-    );
+      state = state.copyWith(
+        isLoading: false,
+        favoriteFlowers: favoriteItems,
+        situationRecords: kGardenMockSituationRecords,
+        letterRecords: kGardenMockLetterRecords,
+      );
+    } catch (error) {
+      state = state.copyWith(
+        isLoading: false,
+        favoriteFlowers: [],
+        situationRecords: kGardenMockSituationRecords,
+        letterRecords: kGardenMockLetterRecords,
+      );
+      _handleError(error);
+    }
   }
 
   void _handleError(dynamic error) {

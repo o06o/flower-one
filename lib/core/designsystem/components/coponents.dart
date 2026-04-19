@@ -19,3 +19,6 @@ export 'image/empty_flower_image.dart';
 
 /// Spacing
 export 'spacing/spacing.dart';
+
+/// Text
+export 'text/outlined_text.dart';
