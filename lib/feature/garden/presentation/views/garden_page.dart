@@ -1,233 +1,374 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flowerone/core/designsystem/components/coponents.dart';
+import 'package:flowerone/core/designsystem/theme/theme_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/constants/app_messages.dart';
-import '../../../../core/designsystem/components/coponents.dart';
-import '../../../../core/designsystem/theme/theme_data.dart';
-import '../../../../core/network/supabase/supabase_api.dart';
-import '../../../../core/network/supabase/supabase_providers.dart';
-import '../../../../libraries/logger/logger.dart';
+import '../model/garden_section_item_model.dart';
+import '../viewmodel/garden_viewmodel.dart';
 
-class GardenPage extends ConsumerStatefulWidget {
+class GardenPage extends HookConsumerWidget {
   const GardenPage({super.key});
 
   @override
-  ConsumerState<GardenPage> createState() => _GardenPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(gardenViewModelProvider);
+    final viewModel = ref.read(gardenViewModelProvider.notifier);
 
-class _FavoriteFlowerRow {
-  final int? flowerId;
-  final String name;
-  final String? meaning;
-  final String? imageUrl;
-
-  const _FavoriteFlowerRow({
-    this.flowerId,
-    required this.name,
-    this.meaning,
-    this.imageUrl,
-  });
-
-  static _FavoriteFlowerRow? tryParse(dynamic raw) {
-    if (raw is! Map) return null;
-    final m = Map<String, dynamic>.from(raw);
-    final name = _pickString(m, const [
-      'korean_name',
-      'english_name',
-      'name',
-      'flower_name',
-      'title',
-    ]);
-    if (name == null || name.isEmpty) return null;
-    return _FavoriteFlowerRow(
-      flowerId: _pickInt(m, const ['flower_id', 'id']),
-      name: name,
-      meaning: _pickString(m, const [
-        'description',
-        'meaning',
-        'flower_meaning',
-        'reason',
-        'scientific_name',
-      ]),
-      imageUrl: _pickString(m, const ['image_url', 'imageUrl', 'photo_url']),
-    );
-  }
-}
-
-String? _pickString(Map<String, dynamic> m, List<String> keys) {
-  for (final k in keys) {
-    final v = m[k];
-    if (v == null) continue;
-    final s = v.toString().trim();
-    if (s.isNotEmpty) return s;
-  }
-  return null;
-}
-
-int? _pickInt(Map<String, dynamic> m, List<String> keys) {
-  for (final k in keys) {
-    final v = m[k];
-    if (v == null) continue;
-    if (v is int) return v;
-    if (v is num) return v.toInt();
-    final p = int.tryParse(v.toString());
-    if (p != null) return p;
-  }
-  return null;
-}
-
-List<_FavoriteFlowerRow> _parseFavoriteRows(dynamic res) {
-  if (res is! List) return const [];
-  final out = <_FavoriteFlowerRow>[];
-  for (final item in res) {
-    final row = _FavoriteFlowerRow.tryParse(item);
-    if (row != null) out.add(row);
-  }
-  return out;
-}
-
-class _GardenPageState extends ConsumerState<GardenPage> {
-  bool _loading = true;
-  String? _error;
-  List<_FavoriteFlowerRow> _rows = const [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadFavorites();
-  }
-
-  Future<void> _loadFavorites({bool blockUi = true}) async {
-    if (blockUi) {
-      setState(() {
-        _loading = true;
-        _error = null;
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        viewModel.loadMockData();
       });
-    }
-    try {
-      final res = await ref
-          .read(supabaseApiProvider)
-          .rpc(SupabaseApi.rpcGetMyFavoriteFlowers);
-      "res -> $res".logW();
-      if (!mounted) return;
-      setState(() {
-        _rows = _parseFavoriteRows(res);
-        _loading = false;
-        _error = null;
-      });
-    } catch (e) {
-      "err -> $e".logE();
+      return null;
+    }, []);
 
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        if (blockUi) _error = e.toString();
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return BottomNavWithContainer(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SpacingVertical20(),
+          SpacingVertical12(),
           Text(
             AppMessages.gardenTitle,
             style: context.textTheme.headline1RegularHakgyo,
           ),
-          const SizedBox(height: 16),
-          Expanded(child: _buildBody(context)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBody(BuildContext context) {
-    if (_loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              AppMessages.favoriteLoadFailed,
-              style: context.textTheme.default15Medium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: _loadFavorites,
-              child: const Text(AppMessages.gardenRetry),
-            ),
-          ],
-        ),
-      );
-    }
-    if (_rows.isEmpty) {
-      return Center(
-        child: Text(
-          AppMessages.favoriteEmpty,
-          style: context.textTheme.default15Medium,
-        ),
-      );
-    }
-    return RefreshIndicator(
-      onRefresh: () => _loadFavorites(blockUi: false),
-      child: ListView.separated(
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: _rows.length,
-        separatorBuilder: (_, _) => const Divider(height: 1),
-        itemBuilder: (context, index) {
-          final row = _rows[index];
-          return ListTile(
-            contentPadding: const EdgeInsets.symmetric(vertical: 4),
-            leading: _FavoriteLeading(imageUrl: row.imageUrl),
-            title: Text(
-              row.name,
-              style: context.textTheme.default16SemiBold,
-            ),
-            subtitle: row.meaning != null && row.meaning!.isNotEmpty
-                ? Text(
-                    row.meaning!,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.default14Regular.copyWith(
-                      color: context.colorScheme.text_2,
+          SpacingVertical20(),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const _SectionHeader(
+                    icon: Icons.favorite_rounded,
+                    title: '즐겨찾기 한 꽃',
+                  ),
+                  SpacingVertical12(),
+                  SizedBox(
+                    height: 120,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: state.favoriteFlowers.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 12),
+                      itemBuilder: (context, index) {
+                        final item = state.favoriteFlowers[index];
+                        return _FavoriteFlowerItem(data: item);
+                      },
                     ),
-                  )
-                : null,
-          );
-        },
+                  ),
+                  SpacingVertical20(),
+                  const _SectionHeader(
+                    icon: Icons.event_note_rounded,
+                    title: '상황 기록',
+                  ),
+                  SpacingVertical12(),
+                  ListView.separated(
+                    itemCount: state.situationRecords.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final item = state.situationRecords[index];
+                      return _SituationCard(data: item);
+                    },
+                  ),
+                  SpacingVertical20(),
+                  const _SectionHeader(icon: Icons.mail_rounded, title: '편지 기록'),
+                  SpacingVertical12(),
+                  SizedBox(
+                    height: 188,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: state.letterRecords.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 10),
+                      itemBuilder: (context, index) {
+                        final item = state.letterRecords[index];
+                        return _LetterCard(data: item);
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _FavoriteLeading extends StatelessWidget {
-  final String? imageUrl;
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String title;
 
-  const _FavoriteLeading({this.imageUrl});
+  const _SectionHeader({required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
-    final scheme = context.colorScheme;
-    final url = imageUrl?.trim();
-    if (url == null || url.isEmpty) {
-      return CircleAvatar(
-        backgroundColor: scheme.white,
-        child: Icon(Icons.local_florist_rounded, color: scheme.primary),
-      );
+    final colorScheme = context.colorScheme;
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: colorScheme.primary),
+        const SizedBox(width: 6),
+        Text(
+          title,
+          style: context.textTheme.headline2RegularHakgyo.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const Spacer(),
+        Text(
+          '전체보기',
+          style: context.textTheme.main2Regular.copyWith(
+            color: colorScheme.text_2,
+          ),
+        ),
+        Icon(Icons.chevron_right_rounded, size: 18, color: colorScheme.text_2),
+      ],
+    );
+  }
+}
+
+class _FavoriteFlowerItem extends StatelessWidget {
+  final GardenFavoriteFlowerItemModel data;
+
+  const _FavoriteFlowerItem({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 88,
+      decoration: BoxDecoration(
+        color: context.colorScheme.white,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+            child: _NetworkImageBox(
+              url: data.imageUrl,
+              width: 88,
+              height: 88,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            data.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.textTheme.main2RegularHakgyo,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SituationCard extends StatelessWidget {
+  final GardenSituationRecordItemModel data;
+
+  const _SituationCard({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colorScheme.line),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _DateBadge(monthDay: data.monthDay, dayOfWeek: data.dayOfWeek),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  data.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.main1RegularHakgyo.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SpacingVertical8(),
+                Text(
+                  data.description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.subText2Regular.copyWith(
+                    color: colorScheme.text_2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SpacingHorizontal8(),
+          Icon(Icons.chevron_right_rounded, color: colorScheme.text_2),
+        ],
+      ),
+    );
+  }
+}
+
+class _DateBadge extends StatelessWidget {
+  final String monthDay;
+  final String dayOfWeek;
+
+  const _DateBadge({required this.monthDay, required this.dayOfWeek});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    return Container(
+      width: 56,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: colorScheme.primary.withAlpha(14),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            monthDay,
+            style: context.textTheme.main1RegularHakgyo.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            dayOfWeek,
+            style: context.textTheme.subText2Regular.copyWith(
+              color: colorScheme.text_2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LetterCard extends StatelessWidget {
+  final GardenLetterRecordItemModel data;
+
+  const _LetterCard({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    return Container(
+      width: 140,
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.line),
+      ),
+      child: Stack(
+        children: [
+          ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: _NetworkImageBox(url: data.backgroundImageUrl,width: 140,),),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  context.colorScheme.white.withValues(alpha: 0.3),
+                  context.colorScheme.white,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              data.preview,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.main2RegularHakgyo,
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    data.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textTheme.main1RegularHakgyoBold,
+                  ),
+                  SpacingVertical6(),
+                  Text(
+                    data.date,
+                    style: context.textTheme.subText2RegularHakgyo,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NetworkImageBox extends StatelessWidget {
+  final String? url;
+  final double? width;
+  final double? height;
+  final BoxFit fit;
+
+  const _NetworkImageBox({
+    required this.url,
+    this.width,
+    this.height,
+    this.fit = BoxFit.cover,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+    final imageUrl = url?.trim();
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return _fallback(colorScheme, width, height);
     }
-    return CircleAvatar(
-      backgroundColor: scheme.white,
-      backgroundImage: CachedNetworkImageProvider(url),
-      onBackgroundImageError: (_, _) {},
-      child: null,
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      width: width,
+      height: height,
+      fit: fit,
+      placeholder: (_, __) => _fallback(colorScheme, width, height),
+      errorWidget: (_, __, ___) => _fallback(colorScheme, width, height),
+    );
+  }
+
+  Widget _fallback(
+    FlowerColorScheme colorScheme,
+    double? width,
+    double? height,
+  ) {
+    return Container(
+      width: width,
+      height: height,
+      color: colorScheme.primary.withAlpha(18),
+      alignment: Alignment.center,
+      child: Icon(Icons.local_florist_rounded, color: colorScheme.primary),
     );
   }
 }

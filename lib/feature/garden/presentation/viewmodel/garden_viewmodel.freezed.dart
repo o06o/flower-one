@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GardenState {
 
- int? get lastGroupNo; bool get isEditable; bool get isLoading; List<FlowerInfoModel?> get favoriteList; UiResult<GardenUiEvent>? get result;
+ bool get isLoading; List<GardenFavoriteFlowerItemModel> get favoriteFlowers; List<GardenSituationRecordItemModel> get situationRecords; List<GardenLetterRecordItemModel> get letterRecords; UiResult<GardenUiEvent>? get result;
 /// Create a copy of GardenState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $GardenStateCopyWith<GardenState> get copyWith => _$GardenStateCopyWithImpl<Gard
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GardenState&&(identical(other.lastGroupNo, lastGroupNo) || other.lastGroupNo == lastGroupNo)&&(identical(other.isEditable, isEditable) || other.isEditable == isEditable)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&const DeepCollectionEquality().equals(other.favoriteList, favoriteList)&&(identical(other.result, result) || other.result == result));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GardenState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&const DeepCollectionEquality().equals(other.favoriteFlowers, favoriteFlowers)&&const DeepCollectionEquality().equals(other.situationRecords, situationRecords)&&const DeepCollectionEquality().equals(other.letterRecords, letterRecords)&&(identical(other.result, result) || other.result == result));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,lastGroupNo,isEditable,isLoading,const DeepCollectionEquality().hash(favoriteList),result);
+int get hashCode => Object.hash(runtimeType,isLoading,const DeepCollectionEquality().hash(favoriteFlowers),const DeepCollectionEquality().hash(situationRecords),const DeepCollectionEquality().hash(letterRecords),result);
 
 @override
 String toString() {
-  return 'GardenState(lastGroupNo: $lastGroupNo, isEditable: $isEditable, isLoading: $isLoading, favoriteList: $favoriteList, result: $result)';
+  return 'GardenState(isLoading: $isLoading, favoriteFlowers: $favoriteFlowers, situationRecords: $situationRecords, letterRecords: $letterRecords, result: $result)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $GardenStateCopyWith<$Res>  {
   factory $GardenStateCopyWith(GardenState value, $Res Function(GardenState) _then) = _$GardenStateCopyWithImpl;
 @useResult
 $Res call({
- int? lastGroupNo, bool isEditable, bool isLoading, List<FlowerInfoModel?> favoriteList, UiResult<GardenUiEvent>? result
+ bool isLoading, List<GardenFavoriteFlowerItemModel> favoriteFlowers, List<GardenSituationRecordItemModel> situationRecords, List<GardenLetterRecordItemModel> letterRecords, UiResult<GardenUiEvent>? result
 });
 
 
@@ -62,13 +62,13 @@ class _$GardenStateCopyWithImpl<$Res>
 
 /// Create a copy of GardenState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? lastGroupNo = freezed,Object? isEditable = null,Object? isLoading = null,Object? favoriteList = null,Object? result = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? isLoading = null,Object? favoriteFlowers = null,Object? situationRecords = null,Object? letterRecords = null,Object? result = freezed,}) {
   return _then(_self.copyWith(
-lastGroupNo: freezed == lastGroupNo ? _self.lastGroupNo : lastGroupNo // ignore: cast_nullable_to_non_nullable
-as int?,isEditable: null == isEditable ? _self.isEditable : isEditable // ignore: cast_nullable_to_non_nullable
-as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,favoriteList: null == favoriteList ? _self.favoriteList : favoriteList // ignore: cast_nullable_to_non_nullable
-as List<FlowerInfoModel?>,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
+isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,favoriteFlowers: null == favoriteFlowers ? _self.favoriteFlowers : favoriteFlowers // ignore: cast_nullable_to_non_nullable
+as List<GardenFavoriteFlowerItemModel>,situationRecords: null == situationRecords ? _self.situationRecords : situationRecords // ignore: cast_nullable_to_non_nullable
+as List<GardenSituationRecordItemModel>,letterRecords: null == letterRecords ? _self.letterRecords : letterRecords // ignore: cast_nullable_to_non_nullable
+as List<GardenLetterRecordItemModel>,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
 as UiResult<GardenUiEvent>?,
   ));
 }
@@ -154,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? lastGroupNo,  bool isEditable,  bool isLoading,  List<FlowerInfoModel?> favoriteList,  UiResult<GardenUiEvent>? result)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isLoading,  List<GardenFavoriteFlowerItemModel> favoriteFlowers,  List<GardenSituationRecordItemModel> situationRecords,  List<GardenLetterRecordItemModel> letterRecords,  UiResult<GardenUiEvent>? result)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GardenState() when $default != null:
-return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.favoriteList,_that.result);case _:
+return $default(_that.isLoading,_that.favoriteFlowers,_that.situationRecords,_that.letterRecords,_that.result);case _:
   return orElse();
 
 }
@@ -175,10 +175,10 @@ return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.favorit
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? lastGroupNo,  bool isEditable,  bool isLoading,  List<FlowerInfoModel?> favoriteList,  UiResult<GardenUiEvent>? result)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isLoading,  List<GardenFavoriteFlowerItemModel> favoriteFlowers,  List<GardenSituationRecordItemModel> situationRecords,  List<GardenLetterRecordItemModel> letterRecords,  UiResult<GardenUiEvent>? result)  $default,) {final _that = this;
 switch (_that) {
 case _GardenState():
-return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.favoriteList,_that.result);case _:
+return $default(_that.isLoading,_that.favoriteFlowers,_that.situationRecords,_that.letterRecords,_that.result);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,10 +195,10 @@ return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.favorit
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? lastGroupNo,  bool isEditable,  bool isLoading,  List<FlowerInfoModel?> favoriteList,  UiResult<GardenUiEvent>? result)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isLoading,  List<GardenFavoriteFlowerItemModel> favoriteFlowers,  List<GardenSituationRecordItemModel> situationRecords,  List<GardenLetterRecordItemModel> letterRecords,  UiResult<GardenUiEvent>? result)?  $default,) {final _that = this;
 switch (_that) {
 case _GardenState() when $default != null:
-return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.favoriteList,_that.result);case _:
+return $default(_that.isLoading,_that.favoriteFlowers,_that.situationRecords,_that.letterRecords,_that.result);case _:
   return null;
 
 }
@@ -210,17 +210,29 @@ return $default(_that.lastGroupNo,_that.isEditable,_that.isLoading,_that.favorit
 
 
 class _GardenState implements GardenState {
-   _GardenState({this.lastGroupNo, this.isEditable = false, this.isLoading = false, final  List<FlowerInfoModel?> favoriteList = const [], this.result}): _favoriteList = favoriteList;
+   _GardenState({this.isLoading = false, final  List<GardenFavoriteFlowerItemModel> favoriteFlowers = const [], final  List<GardenSituationRecordItemModel> situationRecords = const [], final  List<GardenLetterRecordItemModel> letterRecords = const [], this.result}): _favoriteFlowers = favoriteFlowers,_situationRecords = situationRecords,_letterRecords = letterRecords;
   
 
-@override final  int? lastGroupNo;
-@override@JsonKey() final  bool isEditable;
 @override@JsonKey() final  bool isLoading;
- final  List<FlowerInfoModel?> _favoriteList;
-@override@JsonKey() List<FlowerInfoModel?> get favoriteList {
-  if (_favoriteList is EqualUnmodifiableListView) return _favoriteList;
+ final  List<GardenFavoriteFlowerItemModel> _favoriteFlowers;
+@override@JsonKey() List<GardenFavoriteFlowerItemModel> get favoriteFlowers {
+  if (_favoriteFlowers is EqualUnmodifiableListView) return _favoriteFlowers;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_favoriteList);
+  return EqualUnmodifiableListView(_favoriteFlowers);
+}
+
+ final  List<GardenSituationRecordItemModel> _situationRecords;
+@override@JsonKey() List<GardenSituationRecordItemModel> get situationRecords {
+  if (_situationRecords is EqualUnmodifiableListView) return _situationRecords;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_situationRecords);
+}
+
+ final  List<GardenLetterRecordItemModel> _letterRecords;
+@override@JsonKey() List<GardenLetterRecordItemModel> get letterRecords {
+  if (_letterRecords is EqualUnmodifiableListView) return _letterRecords;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_letterRecords);
 }
 
 @override final  UiResult<GardenUiEvent>? result;
@@ -235,16 +247,16 @@ _$GardenStateCopyWith<_GardenState> get copyWith => __$GardenStateCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GardenState&&(identical(other.lastGroupNo, lastGroupNo) || other.lastGroupNo == lastGroupNo)&&(identical(other.isEditable, isEditable) || other.isEditable == isEditable)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&const DeepCollectionEquality().equals(other._favoriteList, _favoriteList)&&(identical(other.result, result) || other.result == result));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GardenState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&const DeepCollectionEquality().equals(other._favoriteFlowers, _favoriteFlowers)&&const DeepCollectionEquality().equals(other._situationRecords, _situationRecords)&&const DeepCollectionEquality().equals(other._letterRecords, _letterRecords)&&(identical(other.result, result) || other.result == result));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,lastGroupNo,isEditable,isLoading,const DeepCollectionEquality().hash(_favoriteList),result);
+int get hashCode => Object.hash(runtimeType,isLoading,const DeepCollectionEquality().hash(_favoriteFlowers),const DeepCollectionEquality().hash(_situationRecords),const DeepCollectionEquality().hash(_letterRecords),result);
 
 @override
 String toString() {
-  return 'GardenState(lastGroupNo: $lastGroupNo, isEditable: $isEditable, isLoading: $isLoading, favoriteList: $favoriteList, result: $result)';
+  return 'GardenState(isLoading: $isLoading, favoriteFlowers: $favoriteFlowers, situationRecords: $situationRecords, letterRecords: $letterRecords, result: $result)';
 }
 
 
@@ -255,7 +267,7 @@ abstract mixin class _$GardenStateCopyWith<$Res> implements $GardenStateCopyWith
   factory _$GardenStateCopyWith(_GardenState value, $Res Function(_GardenState) _then) = __$GardenStateCopyWithImpl;
 @override @useResult
 $Res call({
- int? lastGroupNo, bool isEditable, bool isLoading, List<FlowerInfoModel?> favoriteList, UiResult<GardenUiEvent>? result
+ bool isLoading, List<GardenFavoriteFlowerItemModel> favoriteFlowers, List<GardenSituationRecordItemModel> situationRecords, List<GardenLetterRecordItemModel> letterRecords, UiResult<GardenUiEvent>? result
 });
 
 
@@ -272,13 +284,13 @@ class __$GardenStateCopyWithImpl<$Res>
 
 /// Create a copy of GardenState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? lastGroupNo = freezed,Object? isEditable = null,Object? isLoading = null,Object? favoriteList = null,Object? result = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? isLoading = null,Object? favoriteFlowers = null,Object? situationRecords = null,Object? letterRecords = null,Object? result = freezed,}) {
   return _then(_GardenState(
-lastGroupNo: freezed == lastGroupNo ? _self.lastGroupNo : lastGroupNo // ignore: cast_nullable_to_non_nullable
-as int?,isEditable: null == isEditable ? _self.isEditable : isEditable // ignore: cast_nullable_to_non_nullable
-as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,favoriteList: null == favoriteList ? _self._favoriteList : favoriteList // ignore: cast_nullable_to_non_nullable
-as List<FlowerInfoModel?>,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
+isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,favoriteFlowers: null == favoriteFlowers ? _self._favoriteFlowers : favoriteFlowers // ignore: cast_nullable_to_non_nullable
+as List<GardenFavoriteFlowerItemModel>,situationRecords: null == situationRecords ? _self._situationRecords : situationRecords // ignore: cast_nullable_to_non_nullable
+as List<GardenSituationRecordItemModel>,letterRecords: null == letterRecords ? _self._letterRecords : letterRecords // ignore: cast_nullable_to_non_nullable
+as List<GardenLetterRecordItemModel>,result: freezed == result ? _self.result : result // ignore: cast_nullable_to_non_nullable
 as UiResult<GardenUiEvent>?,
   ));
 }
