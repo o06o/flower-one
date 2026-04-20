@@ -80,7 +80,7 @@ class GardenPage extends HookConsumerWidget {
                   ),
                   SpacingVertical12(),
                   SizedBox(
-                    height: 188,
+                    height: 196,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: state.letterRecords.length,
@@ -301,7 +301,6 @@ class _LetterCard extends StatelessWidget {
             child: _NetworkImageBox(url: data.backgroundImageUrl, width: 140),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -314,12 +313,23 @@ class _LetterCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             alignment: Alignment.center,
-            child: OutlinedText(
-              strokeWidth: 2,
-              strokeColor: context.colorScheme.white,
-              child: Text(
-                data.preview,
-                style: context.textTheme.main2RegularHakgyo,
+          ),
+          Positioned(
+            bottom: 40,
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Padding(
+              padding: const EdgeInsetsGeometry.symmetric(vertical: 20, horizontal: 12),
+              child: OutlinedText(
+                strokeWidth: 2,
+                strokeColor: context.colorScheme.white,
+                child: Text(
+                  data.preview,
+                  maxLines: 8,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.main2RegularHakgyo,
+                ),
               ),
             ),
           ),

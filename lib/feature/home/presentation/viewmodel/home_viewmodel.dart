@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flowerone/core/model/exception/flower_exception.dart';
 import 'package:flowerone/core/model/model/flower_info_model.dart';
 import 'package:flowerone/libraries/logger/logger.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/constants/app_messages.dart';
+import '../../../../core/model/recipient_type.dart';
 import '../../../letter/domain/provider/make_letter_usecase_provider.dart';
 import '../../../recommend/data/mapper/flower_mapper.dart';
 import '../../../recommend/domain/provider/get_recommend_flower_usecase_provider.dart';
@@ -62,21 +62,22 @@ abstract class HomeState with _$HomeState {
   }) = _HomeState;
 
   factory HomeState.init() => HomeState(
-        messages: [],
-        currentStep: ChatStep.initial,
-        recommendedFlowers: const [],
-        requestId: null,
-        selectedFlower: null,
-        selectedRecipient: null,
-        userSituation: null,
-        letterContent: null,
-        requestState: const AsyncData<void>(null),
-      );
+    messages: [],
+    currentStep: ChatStep.initial,
+    recommendedFlowers: const [],
+    requestId: null,
+    selectedFlower: null,
+    selectedRecipient: null,
+    userSituation: null,
+    letterContent: null,
+    requestState: const AsyncData<void>(null),
+  );
 }
 
 @Riverpod(keepAlive: false)
 class HomeViewModel extends _$HomeViewModel {
-  final _messagesController = StreamController<List<HomeChatMessage>>.broadcast();
+  final _messagesController =
+      StreamController<List<HomeChatMessage>>.broadcast();
   List<HomeChatMessage> _messages = [];
 
   @override
@@ -87,7 +88,8 @@ class HomeViewModel extends _$HomeViewModel {
     return HomeState.init();
   }
 
-  Stream<List<HomeChatMessage>> get messagesStream => _messagesController.stream;
+  Stream<List<HomeChatMessage>> get messagesStream =>
+      _messagesController.stream;
 
   void _addMessage(HomeChatMessage message) {
     _messages = [..._messages, message];
@@ -119,9 +121,9 @@ class HomeViewModel extends _$HomeViewModel {
     );
 
     try {
-      final recommendResponse = await ref.read(getRecommendFlowerUseCaseProvider).call(
-            situation: trimmed,
-          );
+      final recommendResponse = await ref
+          .read(getRecommendFlowerUseCaseProvider)
+          .call(situation: trimmed);
 
       final flowers = recommendResponse.result.flowers
           .map((dto) => dto.toFlowerInfoModel())
@@ -146,15 +148,17 @@ class HomeViewModel extends _$HomeViewModel {
         messages: _messages,
       );
 
-      _addMessage(HomeChatMessage.text(
-        text: AppMessages.recommendSubtitle,
-        isUser: false,
-      ));
+      _addMessage(
+        HomeChatMessage.text(
+          text: AppMessages.recommendSubtitle,
+          isUser: false,
+        ),
+      );
       _addMessage(HomeChatMessage.flowerCards(flowers: flowers));
       _addMessage(HomeChatMessage.actionButtons());
     } catch (error) {
       "home chat error: ${error.toString()}".logE();
-      
+
       // 로딩 메시지 제거
       if (_messages.isNotEmpty) {
         _messages = _messages.sublist(0, _messages.length - 1);
@@ -165,7 +169,9 @@ class HomeViewModel extends _$HomeViewModel {
         currentStep: ChatStep.initial,
         messages: _messages,
         requestState: AsyncError<void>(
-          error is FlowerException ? error : FlowerException(message: error.toString()),
+          error is FlowerException
+              ? error
+              : FlowerException(message: error.toString()),
           StackTrace.current,
         ),
       );
@@ -190,12 +196,11 @@ class HomeViewModel extends _$HomeViewModel {
     }
 
     state = state.copyWith(currentStep: ChatStep.selectFlower);
-    
-    _addMessage(HomeChatMessage.text(
-      text: '어떤 꽃이 마음에 드시나요?',
-      isUser: false,
-    ));
-    _addMessage(HomeChatMessage.flowerSelection(flowers: state.recommendedFlowers));
+
+    _addMessage(HomeChatMessage.text(text: '어떤 꽃이 마음에 드시나요?', isUser: false));
+    _addMessage(
+      HomeChatMessage.flowerSelection(flowers: state.recommendedFlowers),
+    );
   }
 
   void onSelectFlower(FlowerInfoModel flower) {
@@ -210,26 +215,20 @@ class HomeViewModel extends _$HomeViewModel {
       currentStep: ChatStep.selectRecipient,
     );
 
-    _addMessage(HomeChatMessage.text(
-      text: flower.name,
-      isUser: true,
-    ));
+    _addMessage(HomeChatMessage.text(text: flower.name, isUser: true));
 
     _addMessage(HomeChatMessage.recipientSelection());
   }
 
   Future<void> onSelectRecipient(String recipient) async {
-    final recipientType = _mapRecipientToType(recipient);
+    final recipientType = RecipientTypeX.fromDisplayName(recipient);
     final flower = state.selectedFlower;
     final situation = state.userSituation;
 
     if (flower == null || situation == null) return;
 
     // 선택한 수신자만 남기고 나머지 제거
-    _addMessage(HomeChatMessage.text(
-      text: '누구에게 전하는 꽃인가요?',
-      isUser: false,
-    ));
+    _addMessage(HomeChatMessage.text(text: '누구에게 전하는 꽃인가요?', isUser: false));
     _replaceLastMessage(HomeChatMessage.text(text: recipient, isUser: true));
     _addMessage(HomeChatMessage.loading());
 
@@ -240,10 +239,12 @@ class HomeViewModel extends _$HomeViewModel {
     );
 
     try {
-      final letterResponse = await ref.read(makeLetterUseCaseProvider).call(
+      final letterResponse = await ref
+          .read(makeLetterUseCaseProvider)
+          .call(
             requestId: state.requestId!,
             flowerId: flower.flowerId!,
-            recipient: recipientType,
+            recipient: recipientType.apiValue,
           );
 
       final letter = letterResponse.result.letter;
@@ -259,13 +260,12 @@ class HomeViewModel extends _$HomeViewModel {
         messages: _messages,
       );
 
-      _addMessage(HomeChatMessage.text(
-        text: '편지가 완성됐어요!\n\n$letter',
-        isUser: false,
-      ));
+      _addMessage(
+        HomeChatMessage.text(text: '편지가 완성됐어요!\n\n$letter', isUser: false),
+      );
     } catch (error) {
       "letter generation error: ${error.toString()}".logE();
-      
+
       // 로딩 메시지 제거
       if (_messages.isNotEmpty) {
         _messages = _messages.sublist(0, _messages.length - 1);
@@ -276,7 +276,9 @@ class HomeViewModel extends _$HomeViewModel {
         currentStep: ChatStep.selectRecipient,
         messages: _messages,
         requestState: AsyncError<void>(
-          error is FlowerException ? error : FlowerException(message: error.toString()),
+          error is FlowerException
+              ? error
+              : FlowerException(message: error.toString()),
           StackTrace.current,
         ),
       );
@@ -285,26 +287,5 @@ class HomeViewModel extends _$HomeViewModel {
 
   void consumeRequestState() {
     state = state.copyWith(requestState: const AsyncData<void>(null));
-  }
-
-  String _mapRecipientToType(String recipient) {
-    switch (recipient) {
-      case '어른/상사':
-        return 'senior';
-      case '친구':
-        return 'friend';
-      case '연인':
-        return 'significant other';
-      case '동료':
-        return 'coworker';
-      case '동년배':
-        return 'peer';
-      case '동생':
-        return 'junior';
-      case '기타':
-        return 'other';
-      default:
-        return 'other';
-    }
   }
 }

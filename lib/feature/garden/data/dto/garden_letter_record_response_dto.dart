@@ -1,16 +1,28 @@
 class GardenLetterRecordResponseDto {
-  final int? id;
-  final DateTime? createdAt;
-  final String title;
-  final String preview;
-  final String backgroundImageUrl;
+  final int id;
+  final int requestId;
+  final int flowerId;
+  final String recipientType;
+  final String situationText;
+  final String flowerName;
+  final String flowerTags;
+  final String flowerMeanings;
+  final String letterText;
+  final DateTime createdAt;
+  final String flowerImageUrl;
 
   const GardenLetterRecordResponseDto({
     required this.id,
+    required this.requestId,
+    required this.flowerId,
+    required this.recipientType,
+    required this.situationText,
+    required this.flowerName,
+    required this.flowerTags,
+    required this.flowerMeanings,
+    required this.letterText,
     required this.createdAt,
-    required this.title,
-    required this.preview,
-    required this.backgroundImageUrl,
+    required this.flowerImageUrl,
   });
 
   factory GardenLetterRecordResponseDto.fromJson(Map<String, dynamic> json) {
@@ -31,39 +43,24 @@ class GardenLetterRecordResponseDto {
       return null;
     }
 
-    DateTime? readDateTime(List<String> keys) {
+    DateTime readDateTime(List<String> keys) {
       final value = readString(keys);
-      if (value == null) return null;
-      return DateTime.tryParse(value)?.toLocal();
+      if (value == null) return DateTime.now();
+      return DateTime.tryParse(value)?.toLocal() ?? DateTime.now();
     }
 
-    final parsedCreatedAt = readDateTime(['created_at', 'createdAt']);
-    final parsedTitle =
-        readString([
-          'recipient_type',
-          'situation',
-          'title',
-          'occasion',
-          'input_text',
-        ]) ??
-        '보낸 편지';
-    final parsedPreview =
-        readString([
-          'letter_content',
-          'letter',
-          'description',
-          'message',
-          'input_text',
-        ]) ??
-        parsedTitle;
-
     return GardenLetterRecordResponseDto(
-      id: readInt(['id', 'history_id']),
-      createdAt: parsedCreatedAt,
-      title: parsedTitle,
-      preview: parsedPreview,
-      backgroundImageUrl:
-          readString(['image_url', 'public_url', 'background_image_url']) ?? '',
+      id: readInt(['id']) ?? -1,
+      requestId: readInt(['request_id']) ?? -1,
+      flowerId: readInt(['flower_id']) ?? -1,
+      recipientType: readString(['recipient_type']) ?? 'other',
+      situationText: readString(['situation_text']) ?? '',
+      flowerName: readString(['flower_name']) ?? '',
+      flowerTags: readString(['flower_tags']) ?? '',
+      flowerMeanings: readString(['flower_meanings']) ?? '',
+      letterText: readString(['letter_text']) ?? '',
+      createdAt: readDateTime(['created_at']),
+      flowerImageUrl: readString(['flower_image_url']) ?? '',
     );
   }
 }

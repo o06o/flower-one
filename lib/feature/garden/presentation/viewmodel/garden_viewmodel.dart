@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/constants/app_messages.dart';
 import '../../../../core/model/exception/flower_exception.dart';
+import '../../../../core/model/recipient_type.dart';
 import '../../../../core/model/result/ui_result.dart';
 import '../../domain/provider/garden_providers.dart';
 import '../event/garden_ui_event.dart';
@@ -81,10 +82,11 @@ class GardenViewModel extends _$GardenViewModel {
       final letterItems = letters
           .map(
             (item) => GardenLetterRecordItemModel(
-              title: item.title,
+              title:
+                  '${RecipientTypeX.fromApiValue(item.recipientType).displayName}에게',
               date: _formatDate(item.createdAt),
-              preview: item.preview,
-              backgroundImageUrl: item.backgroundImageUrl,
+              preview: item.letterText,
+              backgroundImageUrl: item.flowerImageUrl,
             ),
           )
           .toList();
