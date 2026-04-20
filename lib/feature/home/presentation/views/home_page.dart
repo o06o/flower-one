@@ -88,7 +88,7 @@ class HomePage extends HookConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SpacingVertical48(),
+          SpacingVertical16(),
           Text(
             AppMessages.homeTitle1,
             style: context.textTheme.headline1RegularHakgyo,

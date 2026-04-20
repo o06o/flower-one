@@ -3,6 +3,7 @@ import 'package:flowerone/feature/garden/presentation/views/garden_page.dart';
 import 'package:flowerone/feature/letter/presentation/views/letter_page.dart';
 import 'package:flowerone/feature/map/presentation/views/map_page.dart';
 import 'package:flowerone/feature/recommend/presentation/views/recommend_page.dart';
+import 'package:flowerone/feature/settings/presentation/views/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -90,6 +91,15 @@ final router = GoRouter(
           ),
         );
       },
+    ),
+    GoRoute(
+      name: PAGES.settings.screenName,
+      path: PAGES.settings.screenPath,
+      pageBuilder: (context, state) => FadeTransitionPage(
+        key: state.pageKey,
+        duration: const Duration(milliseconds: 700),
+        child: const SettingsPage(),
+      ),
     ),
     ShellRoute(
       navigatorKey: shellNavigatorKey,
