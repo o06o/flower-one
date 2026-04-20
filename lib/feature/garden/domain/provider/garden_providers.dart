@@ -5,6 +5,8 @@ import '../../data/datastore/garden_datasource.dart';
 import '../../data/repository/garden_repository_impl.dart';
 import '../repository/garden_repository.dart';
 import '../usecase/get_garden_favorites_usecase.dart';
+import '../usecase/get_garden_letter_records_usecase.dart';
+import '../usecase/get_garden_situation_records_usecase.dart';
 
 final gardenDatasourceProvider = Provider<GardenDatasource>((ref) {
   final apiClient = ref.watch(supabaseApiProvider);
@@ -22,3 +24,15 @@ final getGardenFavoritesUseCaseProvider = Provider<GetGardenFavoritesUseCase>((
   final repository = ref.watch(gardenRepositoryProvider);
   return GetGardenFavoritesUseCase(repository);
 });
+
+final getGardenSituationRecordsUseCaseProvider =
+    Provider<GetGardenSituationRecordsUseCase>((ref) {
+      final repository = ref.watch(gardenRepositoryProvider);
+      return GetGardenSituationRecordsUseCase(repository);
+    });
+
+final getGardenLetterRecordsUseCaseProvider =
+    Provider<GetGardenLetterRecordsUseCase>((ref) {
+      final repository = ref.watch(gardenRepositoryProvider);
+      return GetGardenLetterRecordsUseCase(repository);
+    });

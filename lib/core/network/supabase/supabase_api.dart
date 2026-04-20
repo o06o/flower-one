@@ -31,11 +31,47 @@ class SupabaseApi {
   PostgrestQueryBuilder table(String tableName) => _client.from(tableName);
 
   /// DB RPC 호출: `api.rpc('fn_name', params: {...})`
-  Future<T> rpc<T>(
-    String fnName, {
-    Map<String, dynamic>? params,
-  }) {
+  Future<T> rpc<T>(String fnName, {Map<String, dynamic>? params}) {
     return _client.rpc<T>(fnName, params: params);
+  }
+
+  /// recommendation_requests 조회 (상황 기록)
+  Future<List<dynamic>> getRecommendationRequests({int? limit}) async {
+    var query = _client
+        .from('recommendation_requests')
+        .select('''
+          id,
+          input_text,
+          created_at,
+          recommendation_results (
+            flower_id,
+            rank_order,
+            flowers (
+              korean_name
+            )
+          )
+        ''')
+        .order('created_at', ascending: false);
+
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+
+    return await query;
+  }
+
+  /// letter_histories 조회 (편지 기록)
+  Future<List<dynamic>> getLetterHistories({int? limit}) async {
+    var query = _client
+        .from('letter_histories')
+        .select()
+        .order('created_at', ascending: false);
+
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+
+    return await query;
   }
 
   /// Edge Function 호출: `api.invokeFunction('recommend-flower', body: {...})`
@@ -44,10 +80,6 @@ class SupabaseApi {
     Object? body,
     Map<String, String>? headers,
   }) {
-    return _client.functions.invoke(
-      functionName,
-      body: body,
-      headers: headers,
-    );
+    return _client.functions.invoke(functionName, body: body, headers: headers);
   }
 }

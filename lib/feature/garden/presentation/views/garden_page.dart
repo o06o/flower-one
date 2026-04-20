@@ -57,9 +57,10 @@ class GardenPage extends HookConsumerWidget {
                     ),
                   ),
                   SpacingVertical20(),
-                  const _SectionHeader(
+                  _SectionHeader(
                     icon: Icons.event_note_rounded,
                     title: '상황 기록',
+                    onTapViewAll: () => viewModel.loadAllSituationRecords(),
                   ),
                   SpacingVertical12(),
                   ListView.separated(
@@ -104,8 +105,13 @@ class GardenPage extends HookConsumerWidget {
 class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
+  final VoidCallback? onTapViewAll;
 
-  const _SectionHeader({required this.icon, required this.title});
+  const _SectionHeader({
+    required this.icon,
+    required this.title,
+    this.onTapViewAll,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -121,13 +127,25 @@ class _SectionHeader extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        Text(
-          '전체보기',
-          style: context.textTheme.main2Regular.copyWith(
-            color: colorScheme.text_2,
+        GestureDetector(
+          onTap: onTapViewAll,
+          behavior: HitTestBehavior.opaque,
+          child: Row(
+            children: [
+              Text(
+                '전체보기',
+                style: context.textTheme.main2Regular.copyWith(
+                  color: colorScheme.text_2,
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: colorScheme.text_2,
+              ),
+            ],
           ),
         ),
-        Icon(Icons.chevron_right_rounded, size: 18, color: colorScheme.text_2),
       ],
     );
   }

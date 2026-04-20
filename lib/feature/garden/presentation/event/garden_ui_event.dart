@@ -14,4 +14,3 @@ class GroupCreated extends GardenUiEvent {
 class GroupsLeft extends GardenUiEvent {
   const GroupsLeft();
 }
-
