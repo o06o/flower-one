@@ -15,12 +15,12 @@ class SettingsSectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(0, 8, 10, 6),
+            padding: const EdgeInsets.fromLTRB(0, 8, 10, 4),
             child: Text(
               title,
               style: context.textTheme.main2Regular.copyWith(

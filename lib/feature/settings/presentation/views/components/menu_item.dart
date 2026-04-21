@@ -29,7 +29,7 @@ class SettingsMenuItem extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 14),
         child: Row(
           children: [
             Icon(icon, size: 20, color: textColor),
