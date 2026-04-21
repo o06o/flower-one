@@ -10,6 +10,12 @@ class DefaultContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final backgroundColor = color ?? context.colorScheme.white;
-    return Material(color: backgroundColor, child: child);
+    return Material(
+      color: backgroundColor,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+        child: child,
+      ),
+    );
   }
 }
