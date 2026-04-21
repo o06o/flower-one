@@ -1,3 +1,4 @@
+import 'package:flowerone/libraries/logger/logger.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart';
 
@@ -23,10 +24,7 @@ class GoogleSignClient {
   static const String _serverClientIdFromEnv = String.fromEnvironment(
     'GOOGLE_SERVER_CLIENT_ID',
   );
-  static const List<String> _defaultScopes = <String>[
-    'email',
-    'https://www.googleapis.com/auth/contacts.readonly',
-  ];
+  static const List<String> _defaultScopes = <String>['email'];
 
   final GoogleSignIn _googleSignIn;
   static Future<void>? _initializeFuture;
@@ -79,18 +77,16 @@ class GoogleSignClient {
           await authorizationClient.authorizeScopes(_defaultScopes);
       if (authorization.accessToken.isEmpty) return null;
 
-      final GoogleSignInServerAuthorization? serverAuthorization =
-          await authorizationClient.authorizeServer(_defaultScopes);
-
       return GoogleSignInResult(
         idToken: idToken,
         accessToken: authorization.accessToken,
-        serverAuthCode: serverAuthorization?.serverAuthCode,
+        serverAuthCode: null,
       );
     } on GoogleSignInException catch (error) {
       if (error.code == GoogleSignInExceptionCode.canceled) return null;
       return null;
     } catch (error) {
+      "error $error".logE();
       return null; // 에러 처리
     }
   }
