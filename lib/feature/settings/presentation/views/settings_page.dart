@@ -57,6 +57,7 @@ class SettingsPage extends ConsumerWidget {
             SettingsProfileHeaderCard(
               userName: state.userName.isEmpty ? '이름 미설정' : state.userName,
               userEmail: state.userEmail.isEmpty ? '이메일 미설정' : state.userEmail,
+              profileImageUrl: state.profileImageUrl,
             ),
             SpacingVertical24(),
             SettingsSectionCard(

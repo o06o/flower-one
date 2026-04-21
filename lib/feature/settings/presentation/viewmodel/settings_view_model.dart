@@ -11,6 +11,7 @@ class SettingsState {
   final bool isSignedOut;
   final String userName;
   final String userEmail;
+  final String? profileImageUrl;
   final bool isPushNotificationEnabled;
   final String appVersion;
   final String? errorMessage;
@@ -20,6 +21,7 @@ class SettingsState {
     required this.isSignedOut,
     required this.userName,
     required this.userEmail,
+    required this.profileImageUrl,
     required this.isPushNotificationEnabled,
     required this.appVersion,
     this.errorMessage,
@@ -28,6 +30,7 @@ class SettingsState {
   const SettingsState.init({
     String userName = '',
     String userEmail = '',
+    String? profileImageUrl,
     bool isPushNotificationEnabled = true,
     String appVersion = '',
   }) : this(
@@ -35,6 +38,7 @@ class SettingsState {
          isSignedOut: false,
          userName: userName,
          userEmail: userEmail,
+         profileImageUrl: profileImageUrl,
          isPushNotificationEnabled: isPushNotificationEnabled,
          appVersion: appVersion,
          errorMessage: null,
@@ -45,6 +49,7 @@ class SettingsState {
     bool? isSignedOut,
     String? userName,
     String? userEmail,
+    String? profileImageUrl,
     bool? isPushNotificationEnabled,
     String? appVersion,
     String? errorMessage,
@@ -55,6 +60,7 @@ class SettingsState {
       isSignedOut: isSignedOut ?? this.isSignedOut,
       userName: userName ?? this.userName,
       userEmail: userEmail ?? this.userEmail,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       isPushNotificationEnabled:
           isPushNotificationEnabled ?? this.isPushNotificationEnabled,
       appVersion: appVersion ?? this.appVersion,
@@ -79,6 +85,9 @@ class SettingsViewModel extends StateNotifier<SettingsState> {
           ),
           userEmail:
               _ref.read(supabaseAuthProvider).currentUser?.email?.trim() ?? '',
+          profileImageUrl: _extractProfileImageUrl(
+            _ref.read(supabaseAuthProvider).currentUser,
+          ),
         ),
       ) {
     _loadPushNotificationSetting();
@@ -138,6 +147,21 @@ class SettingsViewModel extends StateNotifier<SettingsState> {
       if (value is String && value.trim().isNotEmpty) return value.trim();
     }
     return '';
+  }
+
+  static String? _extractProfileImageUrl(User? user) {
+    if (user == null) return null;
+    final metadata = user.userMetadata ?? const <String, dynamic>{};
+
+    String? readUrl(String key) {
+      final value = metadata[key];
+      if (value is String && value.trim().isNotEmpty) {
+        return value.trim();
+      }
+      return null;
+    }
+
+    return readUrl('avatar_url') ?? readUrl('picture');
   }
 
   Future<void> _loadAppVersion() async {
