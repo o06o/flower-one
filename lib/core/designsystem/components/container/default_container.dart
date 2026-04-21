@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 
 class DefaultContainer extends StatelessWidget {
   final Widget child;
+  final Color? color;
 
-  const DefaultContainer({super.key, required this.child});
+  const DefaultContainer({super.key, required this.child, this.color});
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = context.colorScheme.white;
+    final backgroundColor = color ?? context.colorScheme.white;
     return Material(color: backgroundColor, child: child);
   }
 }
