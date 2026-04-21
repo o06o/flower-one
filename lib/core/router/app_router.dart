@@ -21,7 +21,7 @@ final router = GoRouter(
   initialLocation: PAGES.splash.screenPath,
   requestFocus: false,
   redirect: (context, state) {
-    // final uri = state.uri;
+    final uri = state.uri;
     //
     // final inviteCode = uri.queryParameters["code"];
     // final clientToken = uri.queryParameters["clientToken"];
@@ -34,11 +34,21 @@ final router = GoRouter(
     //       if (clientToken != null) "clientToken": clientToken,
     //     },
     //   ).toString();
-    // } else if (uri.path.contains('/__/auth/callback')) {
-    //   return null; // 이 경로는 그대로 통과
-    // } else {
+    if (uri.toString().contains('/login-callback')) {
+      final error = uri.queryParameters['error'];
+      final errorDescription = uri.queryParameters['error_description'];
+
+      if (error != null) {
+        return Uri(
+          path: PAGES.signIn.screenPath,
+          queryParameters: {'error_message': errorDescription ?? '로그인에 실패했습니다.'},
+        ).toString();
+      }
+
+      return Uri(path: PAGES.splash.screenPath).toString();
+    } else {
       return null;
-    // }
+    }
   },
   routes: [
     GoRoute(

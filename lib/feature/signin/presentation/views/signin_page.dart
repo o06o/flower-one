@@ -22,6 +22,18 @@ class SignInPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final errorMessage = GoRouterState.of(
+      context,
+    ).uri.queryParameters['error_message'];
+
+    if (errorMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('로그인 실패: $errorMessage')));
+      });
+    }
+
     final state = ref.watch(signInViewModelProvider);
     final viewModel = ref.read(signInViewModelProvider.notifier);
 
@@ -59,12 +71,10 @@ class SignInPage extends ConsumerWidget {
           GoogleSignInWidget(
             width: 230,
             height: 42,
-            onSuccess: (idToken, accessToken, serverAuthCode) =>
-                viewModel.signInWithGoogle(
-                  idToken: idToken,
-                  accessToken: accessToken,
-                  serverAuthCode: serverAuthCode,
-                ),
+            onSuccess: (idToken, accessToken, _) => viewModel.signInWithGoogle(
+              idToken: idToken,
+              accessToken: accessToken,
+            ),
             onFailed: () => _showFailToast(AppMessages.signInGoogleFailed),
           ),
           SpacingVertical16(),
