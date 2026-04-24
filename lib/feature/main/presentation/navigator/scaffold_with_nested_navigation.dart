@@ -30,7 +30,6 @@ class _ScaffoldWithNestedNavigationState
   Widget build(BuildContext context) {
     final selectedItemColor = context.colorScheme.deepRed;
     final mainState = ref.watch(mainViewModelProvider);
-
     return Scaffold(
       backgroundColor: context.colorScheme.neutral,
       body: widget.navigationShell,
@@ -38,6 +37,8 @@ class _ScaffoldWithNestedNavigationState
         backgroundColor: context.colorScheme.neutral,
         surfaceTintColor: Colors.transparent,
         actionsPadding: EdgeInsets.only(right: 20),
+        titleTextStyle: context.textTheme.headline1RegularHakgyo,
+        title: widget.currentIndex == 2 ? Text("나의 정원") : Text(""),
         actions: [
           InkWell(
             onTap: () {

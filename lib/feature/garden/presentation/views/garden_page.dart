@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../core/constants/app_messages.dart';
 import '../model/garden_section_item_model.dart';
 import '../viewmodel/garden_viewmodel.dart';
 
@@ -28,11 +27,6 @@ class GardenPage extends HookConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            AppMessages.gardenTitle,
-            style: context.textTheme.headline1RegularHakgyo,
-          ),
-          SpacingVertical20(),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
