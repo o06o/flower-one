@@ -28,7 +28,6 @@ class GardenPage extends HookConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SpacingVertical12(),
           Text(
             AppMessages.gardenTitle,
             style: context.textTheme.headline1RegularHakgyo,
@@ -48,8 +47,8 @@ class GardenPage extends HookConsumerWidget {
                     height: 120,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      itemCount: state.favoriteFlowers.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 12),
+                      itemCount: 4,
+                      separatorBuilder: (_, _) => const SpacingHorizontal12(),
                       itemBuilder: (context, index) {
                         final item = state.favoriteFlowers[index];
                         return _FavoriteFlowerItem(data: item);
@@ -67,7 +66,7 @@ class GardenPage extends HookConsumerWidget {
                     itemCount: state.situationRecords.length,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SpacingHorizontal10(),
                     itemBuilder: (context, index) {
                       final item = state.situationRecords[index];
                       return _SituationCard(data: item);

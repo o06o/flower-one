@@ -27,6 +27,9 @@ class $AssetsColorsGen {
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
+  /// File path: assets/icons/Ic_arrow_back.svg
+  SvgGenImage get icArrowBack => const SvgGenImage('assets/icons/Ic_arrow_back.svg');
+
   /// File path: assets/icons/Ic_garden_filled.svg
   SvgGenImage get icGardenFilled => const SvgGenImage('assets/icons/Ic_garden_filled.svg');
 
@@ -65,6 +68,7 @@ class $AssetsIconsGen {
 
   /// List of all assets
   List<dynamic> get values => [
+    icArrowBack,
     icGardenFilled,
     floweroneLogo,
     floweroneLogoFilled,

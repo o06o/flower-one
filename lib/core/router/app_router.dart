@@ -105,9 +105,9 @@ final router = GoRouter(
     GoRoute(
       name: PAGES.settings.screenName,
       path: PAGES.settings.screenPath,
-      pageBuilder: (context, state) => FadeTransitionPage(
+      pageBuilder: (context, state) => SlideTransitionPage(
         key: state.pageKey,
-        duration: const Duration(milliseconds: 700),
+        tween: Tween<Offset>(begin: Offset(1.0, 0.0), end: Offset.zero),
         child: const SettingsPage(),
       ),
     ),

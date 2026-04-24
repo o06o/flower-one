@@ -36,6 +36,7 @@ class _ScaffoldWithNestedNavigationState
       body: widget.navigationShell,
       appBar: AppBar(
         backgroundColor: context.colorScheme.neutral,
+        surfaceTintColor: Colors.transparent,
         actionsPadding: EdgeInsets.only(right: 20),
         actions: [
           InkWell(

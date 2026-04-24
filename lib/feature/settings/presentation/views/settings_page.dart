@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/designsystem/components/coponents.dart';
 import '../../../../core/designsystem/dialog/dialog.dart';
 import '../../../../core/designsystem/theme/theme_data.dart';
+import '../../../../core/resource/resource.dart';
 import '../../../../core/router/pages.dart';
 import '../../../../core/utils/url/url_launcher_util.dart';
 import 'components/menu_item.dart';
@@ -47,12 +48,39 @@ class SettingsPage extends ConsumerWidget {
     });
 
     return DefaultContainer(
+      color: context.colorScheme.neutral,
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SpacingVertical24(),
-            Text('설정', style: context.textTheme.headline1RegularHakgyo),
+            SizedBox(
+              height: 42,
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.centerLeft,
+                children: [
+                  Row(
+                    children: [
+                      Assets.icons.icArrowBack.svg(width: 18, height: 18),
+                      SpacingHorizontal12(),
+                      Text(
+                        '설정',
+                        style: context.textTheme.headline1RegularHakgyo,
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    left: -12,
+                    child: GestureDetector(
+                      onTap: () => context.pop(),
+                      behavior: HitTestBehavior.translucent,
+                      child: const SizedBox(width: 42, height: 42),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             SpacingVertical20(),
             SettingsProfileHeaderCard(
               userName: state.userName.isEmpty ? '이름 미설정' : state.userName,
