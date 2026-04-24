@@ -24,7 +24,6 @@ class MainViewModel extends StateNotifier<MainState> {
   StreamSubscription<AuthState>? _authSubscription;
 
   MainViewModel(this._authClient) : super(const MainState.init()) {
-    _syncUserProfileImage();
     _authSubscription = _authClient.onAuthStateChange.listen((_) {
       _syncUserProfileImage();
     });

@@ -16,8 +16,8 @@ import '../viewmodel/settings_view_model.dart';
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
-  static const String _termsUrl = 'https://example.com/terms';
-  static const String _privacyUrl = 'https://example.com/privacy';
+  static const String _termsUrl = 'https://o06.notion.site/34ac49e70da98067bcb1cad7a477e6c2?source=copy_link';
+  static const String _privacyUrl = 'https://o06.notion.site/34ac49e70da98054a32ee7f3c7c0f49c';
   static const String _reviewUrl = 'https://example.com/review';
   static const String _inquiryEmail = 'support@flowerone.app';
 
