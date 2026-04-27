@@ -12,11 +12,15 @@ import '../viewmodel/main_view_model.dart';
 class ScaffoldWithNestedNavigation extends ConsumerStatefulWidget {
   final Widget navigationShell;
   final int currentIndex;
+  final String? appBarTitle;
+  final bool showBackButton;
 
   const ScaffoldWithNestedNavigation({
     super.key,
     required this.currentIndex,
     required this.navigationShell,
+    this.appBarTitle,
+    this.showBackButton = false,
   });
 
   @override
@@ -30,6 +34,8 @@ class _ScaffoldWithNestedNavigationState
   Widget build(BuildContext context) {
     final selectedItemColor = context.colorScheme.deepRed;
     final mainState = ref.watch(mainViewModelProvider);
+    final title =
+        widget.appBarTitle ?? (widget.currentIndex == 2 ? "나의 정원" : "");
     return Scaffold(
       backgroundColor: context.colorScheme.neutral,
       body: widget.navigationShell,
@@ -37,19 +43,39 @@ class _ScaffoldWithNestedNavigationState
         backgroundColor: context.colorScheme.neutral,
         surfaceTintColor: Colors.transparent,
         actionsPadding: EdgeInsets.only(right: 20),
+        leadingWidth: 40,
         titleTextStyle: context.textTheme.headline1RegularHakgyo,
-        title: widget.currentIndex == 2 ? Text("나의 정원") : Text(""),
-        actions: [
-          InkWell(
-            onTap: () {
-              context.push(PAGES.settings.screenPath);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(4),
-              child: _ProfileThumbnail(imageUrl: mainState.profileImageUrl),
-            ),
-          ),
-        ],
+        leading: widget.showBackButton
+            ? InkWell(
+                onTap: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go(PAGES.garden.screenPath);
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Assets.icons.icArrowBack.svg(width: 18, height: 18),
+                ),
+              )
+            : null,
+        title: Text(title),
+        actions: widget.showBackButton
+            ? null
+            : [
+                InkWell(
+                  onTap: () {
+                    context.push(PAGES.settings.screenPath);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: _ProfileThumbnail(
+                      imageUrl: mainState.profileImageUrl,
+                    ),
+                  ),
+                ),
+              ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.shifting,

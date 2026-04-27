@@ -3,8 +3,11 @@ import 'package:flowerone/core/designsystem/components/coponents.dart';
 import 'package:flowerone/core/designsystem/theme/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../../core/router/pages.dart';
+import '../model/garden_detail_type.dart';
 import '../model/garden_section_item_model.dart';
 import '../viewmodel/garden_viewmodel.dart';
 
@@ -32,9 +35,15 @@ class GardenPage extends HookConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const _SectionHeader(
+                  _SectionHeader(
                     icon: Icons.favorite_rounded,
-                    title: '즐겨찾기 한 꽃',
+                    title: GardenDetailType.favoriteFlowers.title,
+                    onTapViewAll: () {
+                      context.pushNamed(
+                        PAGES.gardenDetail.screenName,
+                        extra: GardenDetailType.favoriteFlowers,
+                      );
+                    },
                   ),
                   SpacingVertical12(),
                   SizedBox(
@@ -52,8 +61,13 @@ class GardenPage extends HookConsumerWidget {
                   SpacingVertical20(),
                   _SectionHeader(
                     icon: Icons.event_note_rounded,
-                    title: '상황 기록',
-                    onTapViewAll: () => viewModel.loadAllSituationRecords(),
+                    title: GardenDetailType.situationRecords.title,
+                    onTapViewAll: () {
+                      context.pushNamed(
+                        PAGES.gardenDetail.screenName,
+                        extra: GardenDetailType.situationRecords,
+                      );
+                    },
                   ),
                   SpacingVertical12(),
                   ListView.separated(
@@ -67,9 +81,15 @@ class GardenPage extends HookConsumerWidget {
                     },
                   ),
                   SpacingVertical20(),
-                  const _SectionHeader(
+                  _SectionHeader(
                     icon: Icons.mail_rounded,
-                    title: '편지 기록',
+                    title: GardenDetailType.letterRecords.title,
+                    onTapViewAll: () {
+                      context.pushNamed(
+                        PAGES.gardenDetail.screenName,
+                        extra: GardenDetailType.letterRecords,
+                      );
+                    },
                   ),
                   SpacingVertical12(),
                   SizedBox(
@@ -313,7 +333,10 @@ class _LetterCard extends StatelessWidget {
             left: 0,
             right: 0,
             child: Padding(
-              padding: const EdgeInsetsGeometry.symmetric(vertical: 20, horizontal: 12),
+              padding: const EdgeInsetsGeometry.symmetric(
+                vertical: 20,
+                horizontal: 12,
+              ),
               child: OutlinedText(
                 strokeWidth: 2,
                 strokeColor: context.colorScheme.white,

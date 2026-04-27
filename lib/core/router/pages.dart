@@ -6,6 +6,7 @@ enum PAGES {
   home,
   map,
   garden,
+  gardenDetail,
 
   recommend,
   letter,
@@ -32,6 +33,8 @@ extension AppPageExtension on PAGES {
         return "/map";
       case PAGES.garden:
         return "/garden";
+      case PAGES.gardenDetail:
+        return "/garden/detail";
       case PAGES.flowerDetail:
         return "/flower/:id";
       case PAGES.my:
@@ -61,6 +64,8 @@ extension AppPageExtension on PAGES {
         return "MAP";
       case PAGES.garden:
         return "GARDEN";
+      case PAGES.gardenDetail:
+        return "GARDEN_DETAIL";
       case PAGES.flowerDetail:
         return "GROUP_DETAIL";
       case PAGES.my:

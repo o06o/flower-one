@@ -1,4 +1,6 @@
 import 'package:flowerone/core/router/pages.dart';
+import 'package:flowerone/feature/garden/presentation/model/garden_detail_type.dart';
+import 'package:flowerone/feature/garden/presentation/views/detail/garden_detail_page.dart';
 import 'package:flowerone/feature/garden/presentation/views/garden_page.dart';
 import 'package:flowerone/feature/letter/presentation/views/letter_page.dart';
 import 'package:flowerone/feature/map/presentation/views/map_page.dart';
@@ -41,7 +43,9 @@ final router = GoRouter(
       if (error != null) {
         return Uri(
           path: PAGES.signIn.screenPath,
-          queryParameters: {'error_message': errorDescription ?? '로그인에 실패했습니다.'},
+          queryParameters: {
+            'error_message': errorDescription ?? '로그인에 실패했습니다.',
+          },
         ).toString();
       }
 
@@ -54,10 +58,8 @@ final router = GoRouter(
     GoRoute(
       name: PAGES.splash.screenName,
       path: PAGES.splash.screenPath,
-      pageBuilder: (context, state) => FadeTransitionPage(
-        key: state.pageKey,
-        child: SplashPage(),
-      ),
+      pageBuilder: (context, state) =>
+          FadeTransitionPage(key: state.pageKey, child: SplashPage()),
     ),
     GoRoute(
       name: PAGES.intro.screenName,
@@ -95,10 +97,7 @@ final router = GoRouter(
 
         return FadeTransitionPage(
           key: state.pageKey,
-          child: LetterPage(
-            userMessage: userMessage,
-            flowerName: flowerName,
-          ),
+          child: LetterPage(userMessage: userMessage, flowerName: flowerName),
         );
       },
     ),
@@ -114,14 +113,25 @@ final router = GoRouter(
     ShellRoute(
       navigatorKey: shellNavigatorKey,
       builder: (context, state, child) {
+        final path = state.uri.path;
+        final gardenDetailType = state.extra is GardenDetailType
+            ? state.extra as GardenDetailType
+            : null;
+        final isGardenDetail = path == PAGES.gardenDetail.screenPath;
         return ScaffoldWithNestedNavigation(
-            navigationShell: child,
-            currentIndex: switch (state.uri.path) {
-              "/map" => 0,
-              "/home" => 1,
-              "/garden" => 2,
-              _ => 1,
-            }
+          navigationShell: child,
+          appBarTitle: isGardenDetail
+              ? gardenDetailType?.title ??
+                    GardenDetailType.favoriteFlowers.title
+              : null,
+          showBackButton: isGardenDetail,
+          currentIndex: path.startsWith(PAGES.garden.screenPath)
+              ? 2
+              : switch (path) {
+                  "/map" => 0,
+                  "/home" => 1,
+                  _ => 1,
+                },
         );
       },
       routes: [
@@ -129,29 +139,39 @@ final router = GoRouter(
           parentNavigatorKey: shellNavigatorKey,
           name: PAGES.map.screenName,
           path: PAGES.map.screenPath,
-          pageBuilder: (context, state) => FadeTransitionPage(
-            key: state.pageKey,
-            child: const MapPage(),
-          ),
+          pageBuilder: (context, state) =>
+              FadeTransitionPage(key: state.pageKey, child: const MapPage()),
         ),
         GoRoute(
           parentNavigatorKey: shellNavigatorKey,
           name: PAGES.home.screenName,
           path: PAGES.home.screenPath,
           pageBuilder: (context, state) {
-            return FadeTransitionPage(
-                key: state.pageKey,
-                child: HomePage(),
-              );
-          }),
+            return FadeTransitionPage(key: state.pageKey, child: HomePage());
+          },
+        ),
         GoRoute(
           parentNavigatorKey: shellNavigatorKey,
           name: PAGES.garden.screenName,
           path: PAGES.garden.screenPath,
-          pageBuilder: (context, state) => FadeTransitionPage(
-            key: state.pageKey,
-            child: const GardenPage(),
-          ),
+          pageBuilder: (context, state) =>
+              FadeTransitionPage(key: state.pageKey, child: const GardenPage()),
+        ),
+        GoRoute(
+          parentNavigatorKey: shellNavigatorKey,
+          name: PAGES.gardenDetail.screenName,
+          path: PAGES.gardenDetail.screenPath,
+          pageBuilder: (context, state) {
+            final type = state.extra is GardenDetailType
+                ? state.extra as GardenDetailType
+                : GardenDetailType.favoriteFlowers;
+
+            return SlideTransitionPage(
+              tween: Tween<Offset>(begin: Offset(1.0, 0.0), end: Offset.zero),
+              key: state.pageKey,
+              child: GardenDetailPage(type: type),
+            );
+          },
         ),
         GoRoute(
           parentNavigatorKey: shellNavigatorKey,
@@ -180,11 +200,12 @@ class FadeTransitionPage extends CustomTransitionPage<void> {
     required super.child,
     this.duration = const Duration(milliseconds: 200),
   }) : super(
-            transitionDuration: duration,
-            transitionsBuilder: (c, animation, a2, child) => FadeTransition(
-                  opacity: animation.drive(_curveTween),
-                  child: child,
-                ));
+         transitionDuration: duration,
+         transitionsBuilder: (c, animation, a2, child) => FadeTransition(
+           opacity: animation.drive(_curveTween),
+           child: child,
+         ),
+       );
 
   static final _curveTween = CurveTween(curve: Curves.easeInExpo);
 }
@@ -199,16 +220,14 @@ class SlideTransitionPage extends CustomTransitionPage<void> {
     this.duration = const Duration(milliseconds: 150),
     required this.tween,
   }) : super(
-          transitionDuration: duration,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return SlideTransition(
-              position: animation.drive(
-                tween.chain(
-                  CurveTween(curve: Curves.linear),
-                ),
-              ),
-              child: child,
-            );
-          },
-        );
+         transitionDuration: duration,
+         transitionsBuilder: (context, animation, secondaryAnimation, child) {
+           return SlideTransition(
+             position: animation.drive(
+               tween.chain(CurveTween(curve: Curves.linear)),
+             ),
+             child: child,
+           );
+         },
+       );
 }
