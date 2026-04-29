@@ -133,7 +133,7 @@ class HomePage extends HookConsumerWidget {
                   ),
           ),
           if (state.currentStep == ChatStep.initial) ...[
-            const SizedBox(height: 12),
+            SpacingVertical12(),
             TextFormField(
               controller: messageController,
               minLines: 3,
@@ -148,7 +148,7 @@ class HomePage extends HookConsumerWidget {
                 focusedErrorBorder: inputBorder,
               ),
             ),
-            const SizedBox(height: 12),
+            SpacingVertical12(),
             FilledButton(
               style: FilledButton.styleFrom(
                 backgroundColor: context.colorScheme.primary,
@@ -157,7 +157,7 @@ class HomePage extends HookConsumerWidget {
               child: const Text(AppMessages.homeRecommendButton),
             ),
           ] else
-            const SizedBox(height: 12),
+            SpacingVertical12(),
         ],
       ),
     );
@@ -201,7 +201,9 @@ class HomePage extends HookConsumerWidget {
               flower: flower,
               isFavorite: false,
               onTap: () {},
-              onFavoriteTap: () {},
+              onFavoriteTap: () {
+
+              },
             ),
           );
         },

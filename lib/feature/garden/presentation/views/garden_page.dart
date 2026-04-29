@@ -18,6 +18,10 @@ class GardenPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(gardenViewModelProvider);
     final viewModel = ref.read(gardenViewModelProvider.notifier);
+    final hasFavorites = state.favoriteFlowers.isNotEmpty;
+    final hasSituations = state.situationRecords.isNotEmpty;
+    final hasLetters = state.letterRecords.isNotEmpty;
+    final hasAnySection = hasFavorites || hasSituations || hasLetters;
 
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -35,76 +39,107 @@ class GardenPage extends HookConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _SectionHeader(
-                    icon: Icons.favorite_rounded,
-                    title: GardenDetailType.favoriteFlowers.title,
-                    onTapViewAll: () {
-                      context.pushNamed(
-                        PAGES.gardenDetail.screenName,
-                        extra: GardenDetailType.favoriteFlowers,
-                      );
-                    },
-                  ),
-                  SpacingVertical12(),
-                  SizedBox(
-                    height: 120,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 4,
-                      separatorBuilder: (_, _) => const SpacingHorizontal12(),
-                      itemBuilder: (context, index) {
-                        final item = state.favoriteFlowers[index];
-                        return _FavoriteFlowerItem(data: item);
+                  if (!hasAnySection)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
+                      child: Column(
+                        children: [
+                          Text(
+                            '아직 정원이 채워지지 않았어요.',
+                            textAlign: TextAlign.center,
+                            style: context.textTheme.headline2RegularHakgyo.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SpacingVertical12(),
+                          Text(
+                            '꽃을 추천받거나 즐겨찾기를 해서 정원을 채워주세요',
+                            textAlign: TextAlign.center,
+                            style: context.textTheme.main2Regular.copyWith(
+                              color: context.colorScheme.text_2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (hasFavorites) ...[
+                    _SectionHeader(
+                      icon: Icons.favorite_rounded,
+                      title: GardenDetailType.favoriteFlowers.title,
+                      onTapViewAll: () {
+                        context.pushNamed(
+                          PAGES.gardenDetail.screenName,
+                          extra: GardenDetailType.favoriteFlowers,
+                        );
                       },
                     ),
-                  ),
-                  SpacingVertical20(),
-                  _SectionHeader(
-                    icon: Icons.event_note_rounded,
-                    title: GardenDetailType.situationRecords.title,
-                    onTapViewAll: () {
-                      context.pushNamed(
-                        PAGES.gardenDetail.screenName,
-                        extra: GardenDetailType.situationRecords,
-                      );
-                    },
-                  ),
-                  SpacingVertical12(),
-                  ListView.separated(
-                    itemCount: state.situationRecords.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    separatorBuilder: (_, _) => const SpacingHorizontal10(),
-                    itemBuilder: (context, index) {
-                      final item = state.situationRecords[index];
-                      return _SituationCard(data: item);
-                    },
-                  ),
-                  SpacingVertical20(),
-                  _SectionHeader(
-                    icon: Icons.mail_rounded,
-                    title: GardenDetailType.letterRecords.title,
-                    onTapViewAll: () {
-                      context.pushNamed(
-                        PAGES.gardenDetail.screenName,
-                        extra: GardenDetailType.letterRecords,
-                      );
-                    },
-                  ),
-                  SpacingVertical12(),
-                  SizedBox(
-                    height: 196,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: state.letterRecords.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 10),
-                      itemBuilder: (context, index) {
-                        final item = state.letterRecords[index];
-                        return _LetterCard(data: item);
+                    SpacingVertical12(),
+                    SizedBox(
+                      height: 120,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: state.favoriteFlowers.length <= 4
+                            ? state.favoriteFlowers.length
+                            : 4,
+                        separatorBuilder: (_, _) => const SpacingHorizontal12(),
+                        itemBuilder: (context, index) {
+                          final item = state.favoriteFlowers[index];
+                          return _FavoriteFlowerItem(data: item);
+                        },
+                      ),
+                    ),
+                    SpacingVertical20(),
+                  ],
+                  if (hasSituations) ...[
+                    _SectionHeader(
+                      icon: Icons.event_note_rounded,
+                      title: GardenDetailType.situationRecords.title,
+                      onTapViewAll: () {
+                        context.pushNamed(
+                          PAGES.gardenDetail.screenName,
+                          extra: GardenDetailType.situationRecords,
+                        );
                       },
                     ),
-                  ),
-                  const SizedBox(height: 8),
+                    SpacingVertical12(),
+                    ListView.separated(
+                      itemCount: state.situationRecords.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      separatorBuilder: (_, _) => const SpacingHorizontal10(),
+                      itemBuilder: (context, index) {
+                        final item = state.situationRecords[index];
+                        return _SituationCard(data: item);
+                      },
+                    ),
+                    SpacingVertical20(),
+                  ],
+                  if (hasLetters) ...[
+                    _SectionHeader(
+                      icon: Icons.mail_rounded,
+                      title: GardenDetailType.letterRecords.title,
+                      onTapViewAll: () {
+                        context.pushNamed(
+                          PAGES.gardenDetail.screenName,
+                          extra: GardenDetailType.letterRecords,
+                        );
+                      },
+                    ),
+                    SpacingVertical12(),
+                    SizedBox(
+                      height: 196,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: state.letterRecords.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 10),
+                        itemBuilder: (context, index) {
+                          final item = state.letterRecords[index];
+                          return _LetterCard(data: item);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                 ],
               ),
             ),

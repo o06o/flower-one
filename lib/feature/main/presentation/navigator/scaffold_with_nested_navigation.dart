@@ -105,13 +105,13 @@ class _ScaffoldWithNestedNavigationState
         onTap: (index) {
           switch (index) {
             case 0:
-              context.go(PAGES.map.screenPath);
+              context.pushNamed(PAGES.map.screenName);
               break;
             case 1:
               context.pushNamed(PAGES.home.screenName);
               return;
             case 2:
-              context.go(PAGES.garden.screenPath);
+              context.pushNamed(PAGES.garden.screenName);
               break;
           }
         },
