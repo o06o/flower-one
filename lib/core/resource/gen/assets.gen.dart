@@ -27,8 +27,8 @@ class $AssetsColorsGen {
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
-  /// File path: assets/icons/Ic_arrow_back.svg
-  SvgGenImage get icArrowBack => const SvgGenImage('assets/icons/Ic_arrow_back.svg');
+  /// File path: assets/icons/ic_arrow_back.svg
+  SvgGenImage get icArrowBack => const SvgGenImage('assets/icons/ic_arrow_back.svg');
 
   /// File path: assets/icons/Ic_garden_filled.svg
   SvgGenImage get icGardenFilled => const SvgGenImage('assets/icons/Ic_garden_filled.svg');
