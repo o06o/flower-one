@@ -6,7 +6,7 @@ part of 'garden_viewmodel.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$gardenViewModelHash() => r'6f9860f2b536c19d5512ebd1a018c9b08263c265';
+String _$gardenViewModelHash() => r'9e27162c6a7a4dd80ac30a1f5f15a0418b63200a';
 
 /// See also [GardenViewModel].
 @ProviderFor(GardenViewModel)

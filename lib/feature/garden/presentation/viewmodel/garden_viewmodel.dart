@@ -109,6 +109,7 @@ class GardenViewModel extends _$GardenViewModel {
   }
 
   Future<void> loadAllSituationRecords() async {
+    state = state.copyWith(isLoading: true);
     try {
       final situations = await ref
           .read(getGardenSituationRecordsUseCaseProvider)
@@ -127,8 +128,53 @@ class GardenViewModel extends _$GardenViewModel {
           )
           .toList();
 
-      state = state.copyWith(situationRecords: situationItems);
+      state = state.copyWith(isLoading: false, situationRecords: situationItems);
     } catch (error) {
+      state = state.copyWith(isLoading: false);
+      _handleError(error);
+    }
+  }
+
+  Future<void> loadAllFavoriteFlowers() async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final favorites = await ref.read(getGardenFavoritesUseCaseProvider).call();
+      final favoriteItems = favorites
+          .map(
+            (item) => GardenFavoriteFlowerItemModel(
+              name: item.name,
+              meaning: item.meaning,
+              imageUrl: item.imageUrl,
+            ),
+          )
+          .toList();
+
+      state = state.copyWith(isLoading: false, favoriteFlowers: favoriteItems);
+    } catch (error) {
+      state = state.copyWith(isLoading: false);
+      _handleError(error);
+    }
+  }
+
+  Future<void> loadAllLetterRecords() async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final letters = await ref.read(getGardenLetterRecordsUseCaseProvider).call();
+      final letterItems = letters
+          .map(
+            (item) => GardenLetterRecordItemModel(
+              title:
+                  '${RecipientTypeX.fromApiValue(item.recipientType).displayName}에게',
+              date: _formatDate(item.createdAt),
+              preview: item.letterText,
+              backgroundImageUrl: item.flowerImageUrl,
+            ),
+          )
+          .toList();
+
+      state = state.copyWith(isLoading: false, letterRecords: letterItems);
+    } catch (error) {
+      state = state.copyWith(isLoading: false);
       _handleError(error);
     }
   }
