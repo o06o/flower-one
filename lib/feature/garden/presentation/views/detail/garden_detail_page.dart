@@ -1,4 +1,5 @@
 import 'package:flowerone/core/designsystem/components/container/bottom_nav_with_container.dart';
+import 'package:flowerone/core/designsystem/dialog/bottomsheet/bottom_sheet.dart';
 import 'package:flowerone/core/designsystem/theme/theme_data.dart';
 import 'package:flowerone/feature/garden/presentation/model/garden_detail_type.dart';
 import 'package:flowerone/feature/garden/presentation/model/garden_section_item_model.dart';
@@ -70,41 +71,107 @@ class _FavoriteFlowerGridSection extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         final item = items[index];
-        return _FavoriteFlowerGridCard(item: item);
+        return _FavoriteFlowerGridCard(
+          item: item,
+          onTap: () => _showFavoriteFlowerBottomSheet(context, item),
+        );
       },
+    );
+  }
+
+  void _showFavoriteFlowerBottomSheet(
+    BuildContext context,
+    GardenFavoriteFlowerItemModel item,
+  ) {
+    CustomBottomSheet.wrapShow(
+      backgroundColor: context.colorScheme.white,
+      context: context,
+      child: _FavoriteFlowerBottomSheetContent(item: item),
     );
   }
 }
 
 class _FavoriteFlowerGridCard extends StatelessWidget {
   final GardenFavoriteFlowerItemModel item;
+  final VoidCallback? onTap;
 
-  const _FavoriteFlowerGridCard({required this.item});
+  const _FavoriteFlowerGridCard({required this.item, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.colorScheme.white,
-        borderRadius: BorderRadius.circular(16),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.colorScheme.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                child: GardenNetworkImageBox(url: item.imageUrl, fit: BoxFit.cover),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Text(
+                item.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: context.textTheme.main2RegularHakgyo,
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class _FavoriteFlowerBottomSheetContent extends StatelessWidget {
+  final GardenFavoriteFlowerItemModel item;
+
+  const _FavoriteFlowerBottomSheetContent({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final meaning = item.meaning.trim();
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.5,
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              child: GardenNetworkImageBox(url: item.imageUrl, fit: BoxFit.cover),
+              borderRadius: BorderRadius.circular(16),
+              child: GardenNetworkImageBox(
+                url: item.imageUrl,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: Text(
-              item.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: context.textTheme.main2RegularHakgyo,
+          const SizedBox(height: 16),
+          Text(
+            item.name,
+            textAlign: TextAlign.center,
+            style: context.textTheme.headline2RegularHakgyo.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            meaning.isEmpty ? '꽃말 정보가 없어요.' : meaning,
+            textAlign: TextAlign.center,
+            style: context.textTheme.main1Regular.copyWith(
+              color: context.colorScheme.text_2,
             ),
           ),
         ],
