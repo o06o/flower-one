@@ -85,6 +85,7 @@ class HomePage extends HookConsumerWidget {
     });
 
     return BottomNavWithContainer(
+      color: context.colorScheme.neutral,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
